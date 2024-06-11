@@ -58,5 +58,5 @@ func (r *Router) Match(utterance string) (*string, error) {
 		return nil, fmt.Errorf("no route found")
 	}
 	utterance = r.Routes[indices[0]].Utterances[0]
-	return utterance, nil
+	return &utterance, nil
 }

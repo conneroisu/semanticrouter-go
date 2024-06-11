@@ -23,11 +23,11 @@ func NewGoogleEncoder(
 }
 
 // Encode encodes a query string into a Google search URL.
-func (e *GoogleEncoder) Encode(query string) (string, error) {
+func (e *GoogleEncoder) Encode(query string) ([]float64, error) {
 	model := e.client.EmbeddingModel(e.name)
 	embedding, err := model.EmbedContent(e.ctx)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	// type float32
 	a := embedding.Embedding.Values
@@ -36,5 +36,5 @@ func (e *GoogleEncoder) Encode(query string) (string, error) {
 	for i, v := range a {
 		b[i] = float64(v)
 	}
-
+	return b, nil
 }
