@@ -34,6 +34,9 @@ type Utterance struct {
 }
 
 // Encoder represents a encoding driver in the semantic router.
+//
+// It is an interface that defines a single method, Encode, which takes a string
+// and returns a []float64 representing the embedding of the string.
 type Encoder interface {
 	Encode(string) ([]float64, error)
 }
