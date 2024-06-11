@@ -22,47 +22,76 @@ go get github.com/conneroisu/go-semantic-router
 
 ## Usage
 
+### Conversational Agents Example
+
 ```go
 package main
 
 import (
 	"fmt"
-	"github.com/conneroisu/go-semantic-router"
+	"os"
+
+	semantic_router "github.com/conneroisu/go-semantic-router"
 	"github.com/conneroisu/go-semantic-router/providers"
 )
 
-var PoliticsRoutes = semantic_router.Routes {
+// PoliticsRoutes represents a set of routes that are noteworthy.
+var PoliticsRoutes = semantic_router.Route{
 	Name: "politics",
-	Utterances: []string{
-		"isn't politics the best thing ever",
-		"why don't you tell me about your political opinions",
-		"don't you just love the president",
-		"they're going to destroy this country!",
-		"they will save the country!",
+	Utterances: []semantic_router.Utterance{
+		{Utterance: "isn't politics the best thing ever"},
+		{Utterance: "why don't you tell me about your political opinions"},
+		{Utterance: "don't you just love the president"},
+		{Utterance: "they're going to destroy this country!"},
+		{Utterance: "they will save the country!"},
 	},
 }
 
-var ChitchatRoutes = semantic_router.Routes {
+// ChitchatRoutes represents a set of routes that are noteworthy.
+var ChitchatRoutes = semantic_router.Route{
 	Name: "chitchat",
-	Utterances: []string{
-		"how's the weather today?",
-		"how are things going?",
-		"lovely weather today",
-		"the weather is horrendous",
-		"let's go to the chippy",
+	Utterances: []semantic_router.Utterance{
+		{Utterance: "how's the weather today?"},
+		{Utterance: "how are things going?"},
+		{Utterance: "lovely weather today"},
+		{Utterance: "the weather is horrendous"},
+		{Utterance: "let's go to the chippy"},
 	},
 }
 
+// main runs the example.
 func main() {
-    router := semantic_router.NewRouter(
-		[]semantic_router.Routes{PoliticsRoutes, ChitchatRoutes},
-		providers.OpenAIEncoder{os.Getenv("OPENAI_API_KEY")}
-    )
-    finding, err := router.Match("how's the weather today?")
-    if err != nil {
-        fmt.Println("Error:", err)
-    }
-    fmt.Println("Found:", finding)
+	if err := run(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+
+// run runs the example.
+func run() error {
+	router, err := semantic_router.NewRouter(
+		[]semantic_router.Route{PoliticsRoutes, ChitchatRoutes},
+		providers.OpenAIEncoder{
+			APIKey: os.Getenv("OPENAI_API_KEY"),
+			Model:  "text-embedding-3-small",
+		},
+	)
+	if err != nil {
+		return fmt.Errorf("error creating router: %w", err)
+	}
+	finding, p, err := router.Match("how's the weather today?")
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+	fmt.Println("p:", p)
+	fmt.Println("Found:", finding)
+	finding, p, err = router.Match("ain't politics the best thing ever")
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+	fmt.Println("p:", p)
+	fmt.Println("Found:", finding)
+	return nil
 }
 ```
 
@@ -70,4 +99,110 @@ Output:
 
 ```
 Found: politics
+```
+
+### Veterinarian Example
+
+```go
+
+package main
+
+import (
+	"fmt"
+	"os"
+
+	semantic_router "github.com/conneroisu/go-semantic-router"
+	"github.com/conneroisu/go-semantic-router/providers"
+)
+
+// NoteworthyRoutes represents a set of routes that are noteworthy.
+// noteworthy here means that the routes are likely to be relevant to a noteworthy conversation in a veterinarian appointment.
+var NoteworthyRoutes = semantic_router.Route{
+	Name: "noteworthy",
+	Utterances: []semantic_router.Utterance{
+		{Utterance: "what is the best way to treat a dog with a cold?"},
+		{Utterance: "my cat has been limping, what should I do?"},
+		{Utterance: "how often should I vaccinate my pet?"},
+		{Utterance: "what are the symptoms of parvovirus in dogs?"},
+		{Utterance: "my rabbit isn't eating, is that normal?"},
+		{Utterance: "can you recommend a good diet for an overweight cat?"},
+		{Utterance: "what should I do if my dog is having a seizure?"},
+		{Utterance: "how can I tell if my pet is in pain?"},
+		{Utterance: "what are the side effects of this medication?"},
+		{Utterance: "is it safe to give human medication to my pet?"},
+		{Utterance: "how do I prevent fleas and ticks?"},
+		{Utterance: "my dog has been vomiting, what could be wrong?"},
+		{Utterance: "what's the best way to clean my cat's ears?"},
+		{Utterance: "how do I know if my pet has allergies?"},
+		{Utterance: "what should I feed my puppy?"},
+		{Utterance: "how can I tell if my pet is overweight?"},
+		{Utterance: "what should I do if my pet ingests something toxic?"},
+		{Utterance: "can you explain the spaying/neutering process?"},
+		{Utterance: "how can I make my pet more comfortable during travel?"},
+		{Utterance: "what vaccinations does my pet need?"},
+		{Utterance: "how do I deal with a pet that has separation anxiety?"},
+		{Utterance: "what are the signs of dental problems in pets?"},
+		{Utterance: "how often should I bathe my dog?"},
+		{Utterance: "my pet has a lump, should I be concerned?"},
+		{Utterance: "what should I do if my pet has diarrhea?"},
+		{Utterance: "how can I improve my pet's coat and skin health?"},
+		{Utterance: "what are the signs of heartworm in dogs?"},
+		{Utterance: "how do I train my pet to use a litter box?"},
+		{Utterance: "my pet is drinking a lot of water, is that normal?"},
+		{Utterance: "what are the signs of ear infections in pets?"},
+		{Utterance: "how can I help my pet lose weight?"},
+		{Utterance: "what should I do if my pet is not eating?"},
+	},
+}
+
+var ChitchatRoutes = semantic_router.Route{
+	Name: "chitchat",
+	Utterances: []semantic_router.Utterance{
+		{Utterance: "what is your favorite color?"},
+		{Utterance: "what is your favorite animal?"},
+		{Utterance: "what is your favorite food?"},
+		{Utterance: "what is your favorite movie?"},
+		{Utterance: "how are you?"},
+		{Utterance: "what can you do for me?"},
+		{Utterance: "you seen the new movie?"},
+		{Utterance: "what is the weather?"},
+		{Utterance: "how are you feeling?"},
+		{Utterance: "what is your name?"},
+		{Utterance: "what is your favorite movie?"},
+	},
+}
+
+// main runs the example.
+func main() {
+	if err := run(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+
+// run runs the example.
+func run() error {
+	router, err := semantic_router.NewRouter(
+		[]semantic_router.Route{NoteworthyRoutes, ChitchatRoutes},
+		providers.OpenAIEncoder{
+			APIKey: os.Getenv("OPENAI_API_KEY"),
+			Model:  "text-embedding-3-small",
+		},
+	)
+	finding, p, err := router.Match("how's the weather today?")
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+	fmt.Println("Found:", finding)
+	fmt.Println("p:", p)
+	return nil
+}
+```
+
+Output:
+```bash
+p: 0.999899
+Found: noteworthy
+p: 0.999899
+Found: noteworthy
 ```

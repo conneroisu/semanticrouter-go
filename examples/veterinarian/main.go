@@ -1,3 +1,5 @@
+// Package main shows how to use the semantic router to find the best route for a given utterance
+// in the context of a veterinarian appointment.
 package main
 
 import (
@@ -55,10 +57,13 @@ var ChitchatRoutes = semantic_router.Route{
 		{Utterance: "what is your favorite animal?"},
 		{Utterance: "what is your favorite food?"},
 		{Utterance: "what is your favorite movie?"},
-		{Utterance: "what is that on your shirt?"},
-		{Utterance: "what is that on your pants?"},
-		{Utterance: "what is that on your shoes?"},
-		{Utterance: "what is that on your hat?"},
+		{Utterance: "how are you?"},
+		{Utterance: "what can you do for me?"},
+		{Utterance: "you seen the new movie?"},
+		{Utterance: "what is the weather?"},
+		{Utterance: "how are you feeling?"},
+		{Utterance: "what is your name?"},
+		{Utterance: "what is your favorite movie?"},
 	},
 }
 

@@ -44,7 +44,6 @@ func main() {
 
 // run runs the example.
 func run() error {
-	println("running")
 	router, err := semantic_router.NewRouter(
 		[]semantic_router.Route{PoliticsRoutes, ChitchatRoutes},
 		providers.OpenAIEncoder{
