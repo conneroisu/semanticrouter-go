@@ -32,17 +32,17 @@ func NewRouter(routes []Routes, encoder Encoder) *Router {
 }
 
 // Match returns the route that matches the given utterance.
-func (r *Router) Match(utterance string) (string, error) {
+func (r *Router) Match(utterance string) (*string, error) {
 	encoding, err := r.Encoder.Encode(utterance)
 	if err != nil {
-		return "", fmt.Errorf("error encoding utterance: %w", err)
+		return nil, fmt.Errorf("error encoding utterance: %w", err)
 	}
 	vecs := make([]float64, len(r.Routes))
 	for _, route := range r.Routes {
 		for _, utterance := range route.Utterances {
 			vec, err := r.Encoder.Encode(utterance)
 			if err != nil {
-				return "", fmt.Errorf("error encoding utterance: %w", err)
+				return nil, fmt.Errorf("error encoding utterance: %w", err)
 			}
 			for i, v := range vec {
 				vecs[i] += v
@@ -55,7 +55,7 @@ func (r *Router) Match(utterance string) (string, error) {
 	)
 	scores, indices := TopScores(sim, 1)
 	if len(scores) == 0 {
-		return "", fmt.Errorf("no route found")
+		return nil, fmt.Errorf("no route found")
 	}
 	utterance = r.Routes[indices[0]].Utterances[0]
 	return utterance, nil
