@@ -13,24 +13,22 @@ import (
 //
 // Match can be called on a Router to find the best route for a given utterance.
 type Router struct {
-	// Routes is a slice of Routes.
-	Routes []Route
-	// Encoder is an Encoder that encodes utterances into vectors.
-	Encoder Encoder
+	Routes  []Route `json:"routes" yaml:"routes" toml:"routes"`    // Routes is a slice of Routes.
+	Encoder Encoder `json:"encoder" yaml:"encoder" toml:"encoder"` // Encoder is an Encoder that encodes utterances into vectors.
 }
 
 // Route represents a route in the semantic router.
 //
 // It is a struct that contains a name and a slice of Utterances.
 type Route struct {
-	Name       string      `json:"name"       yaml:"name"       toml:"name"`
-	Utterances []Utterance `json:"utterances" yaml:"utterances" toml:"utterances"`
+	Name       string      `json:"name"       yaml:"name"       toml:"name"`       // Name is the name of the route.
+	Utterances []Utterance `json:"utterances" yaml:"utterances" toml:"utterances"` // Utterances is a slice of Utterances.
 }
 
 // Utterance represents a utterance in the semantic router.
 type Utterance struct {
-	Utterance string    `json:"utterance" yaml:"utterance" toml:"utterance"`
-	Embedding []float64 `json:"embedding" yaml:"embedding" toml:"embedding"`
+	Utterance string    `json:"utterance" yaml:"utterance" toml:"utterance"` // Utterance is the utterance.
+	Embedding []float64 `json:"embedding" yaml:"embedding" toml:"embedding"` // Embedding is the embedding of the utterance.
 }
 
 // Encoder represents a encoding driver in the semantic router.
@@ -39,6 +37,14 @@ type Utterance struct {
 // and returns a []float64 representing the embedding of the string.
 type Encoder interface {
 	Encode(string) ([]float64, error)
+}
+
+// Store is an interface that defines a method, Store, which takes a []float64
+// and stores it in a some sort of data store, and a method, Get, which takes a
+// string and returns a []float64 from the data store.
+type Store interface {
+	Store([]Utterance) error
+	Get(string) ([]float64, error)
 }
 
 // NewRouter creates a new semantic router.
