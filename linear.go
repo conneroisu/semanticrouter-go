@@ -1,7 +1,6 @@
-package semanticrouter
+package semantic_router
 
 import (
-	"fmt"
 	"math"
 	"sort"
 
@@ -9,8 +8,8 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
-// similarityMatrix computes the similarity scores between a query vector and a set of vectors.
-func similarityMatrix(xq, index mat.Matrix) *mat.VecDense {
+// SimilarityMatrix computes the similarity scores between a query vector and a set of vectors.
+func SimilarityMatrix(xq, index mat.Matrix) *mat.VecDense {
 	rows, cols := index.Dims()
 	xqVec, ok := xq.(*mat.VecDense)
 	if !ok {
@@ -40,13 +39,12 @@ func similarityMatrix(xq, index mat.Matrix) *mat.VecDense {
 	return mat.NewVecDense(rows, sim)
 }
 
-// topScores returns the scores and indices of the top k scores from the similarity matrix.
-func topScores(sim *mat.VecDense, topK int) ([]float64, []int) {
+// TopScores returns the scores and indices of the top k scores from the similarity matrix.
+func TopScores(sim *mat.VecDense, topK int) ([]float64, []int) {
 	s := sim.RawVector().Data
 	if topK > len(s) {
 		topK = len(s)
 	}
-
 	type scoreIndex struct {
 		score float64
 		index int
@@ -58,34 +56,11 @@ func topScores(sim *mat.VecDense, topK int) ([]float64, []int) {
 	sort.Slice(si, func(i, j int) bool {
 		return si[i].score > si[j].score
 	})
-
 	topScores := make([]float64, topK)
 	topIndices := make([]int, topK)
 	for i := 0; i < topK; i++ {
 		topScores[i] = si[i].score
 		topIndices[i] = si[i].index
 	}
-
 	return topScores, topIndices
-}
-
-func main() {
-	// Example usage
-	// Define query vector xq and index matrix
-	xq := mat.NewVecDense(3, []float64{1, 2, 3})
-	index := mat.NewDense(4, 3, []float64{
-		1, 2, 3,
-		4, 5, 6,
-		7, 8, 9,
-		10, 11, 12,
-	})
-
-	// Compute similarity matrix
-	sim := similarityMatrix(xq, index)
-	fmt.Println("Similarity scores:", sim.RawVector().Data)
-
-	// Get top scores
-	scores, indices := topScores(sim, 2)
-	fmt.Println("Top scores:", scores)
-	fmt.Println("Indices of top scores:", indices)
 }

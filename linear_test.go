@@ -1,4 +1,4 @@
-package semanticrouter
+package semantic_router
 
 import (
 	"reflect"
@@ -49,7 +49,7 @@ func TestSimilarityMatrix(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := similarityMatrix(tt.xq, tt.index)
+			result := SimilarityMatrix(tt.xq, tt.index)
 			if !mat.EqualApprox(result, tt.expect, 1e-6) {
 				t.Errorf("got %v, want %v", result, tt.expect)
 			}
@@ -98,7 +98,7 @@ func TestTopScores(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotScores, gotIndices := topScores(tt.sim, tt.topK)
+			gotScores, gotIndices := TopScores(tt.sim, tt.topK)
 			if !reflect.DeepEqual(gotScores, tt.wantScores) {
 				t.Errorf("got scores %v, want %v", gotScores, tt.wantScores)
 			}

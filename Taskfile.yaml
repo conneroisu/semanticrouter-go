@@ -1,0 +1,42 @@
+version: '3'
+
+tasks:
+  build:
+    cmds:
+      - go build -v -i main.go
+      
+  clean:
+    cmds:
+      - sh ./scripts/taskfile.clean.sh
+      
+  fmt:
+    cmds:
+    - sh ./scripts/taskfile.fmt.sh
+
+  lint:
+    cmds:
+    - sh ./scripts/taskfile.lint.sh
+
+  test:
+    cmds:
+      - sh ./scripts/taskfile.test.sh
+        
+  database:
+    cmds:
+      - sh ./scripts/taskfile.database.sh 
+
+  dev:
+    cmds:
+      - sh ./scripts/taskfile.dev.sh
+
+  prod:
+    cmds:
+      - sh ./scripts/taskfile.prod.sh
+
+  coverage:
+    cmds:
+      - sh ./scripts/taskfile.coverage.sh
+
+  install:
+    cmds:
+      - sh ./scripts/taskfile.install.sh
