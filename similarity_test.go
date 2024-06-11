@@ -1,6 +1,7 @@
 package semantic_router
 
 import (
+	"fmt"
 	"testing"
 
 	"gonum.org/v1/gonum/floats"
@@ -75,15 +76,19 @@ func TestSimilarityMatrix(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		query := createVecDense(tc.queryVec)
-		index := createVecDense(tc.indexVec)
-		similarity := SimilarityMatrix(query, index)
+		t.Run(fmt.Sprintf("TestSimilarityMatrix(%v, %v)", tc.queryVec, tc.indexVec), func(t *testing.T) {
+			tc := tc
+			t.Parallel()
+			query := createVecDense(tc.queryVec)
+			index := createVecDense(tc.indexVec)
+			similarity := SimilarityMatrix(query, index)
 
-		expected := []float64{tc.expectedSim}
-		actual := []float64{similarity}
+			expected := []float64{tc.expectedSim}
+			actual := []float64{similarity}
 
-		if !floats.EqualApprox(expected, actual, 0.0001) {
-			t.Errorf("SimilarityMatrix(%v, %v) = %v; want %v", tc.queryVec, tc.indexVec, similarity, tc.expectedSim)
-		}
+			if !floats.EqualApprox(expected, actual, 0.0001) {
+				t.Errorf("SimilarityMatrix(%v, %v) = %v; want %v", tc.queryVec, tc.indexVec, similarity, tc.expectedSim)
+			}
+		})
 	}
 }

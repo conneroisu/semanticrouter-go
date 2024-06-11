@@ -36,7 +36,6 @@ func TestNormalizeScores(t *testing.T) {
 		},
 		{input: []float64{-1.0, 0.0, 1.0}, expected: []float64{0.0, 0.5, 1.0}},
 	}
-
 	for _, tc := range testCases {
 		result := NormalizeScores(tc.input)
 		for i, v := range result {
