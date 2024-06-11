@@ -10,7 +10,7 @@ fmt:
 
 .PHONY: test
 test:
-	@sh ./scripts/makefile.test.sh
+	@sh ./scripts/makefile/test.sh
 
 .PHONY: lint
 lint:
