@@ -30,7 +30,6 @@ func SimilarityMatrix(xq, index mat.Matrix) *mat.VecDense {
 		dot := floats.Dot(rowVec, xqVec.RawVector().Data)
 		sim[i] = dot / (indexNorm[i] * xqNorm)
 	}
-	// if a vecot is NaN, it will be replaced by 0
 	for i, v := range sim {
 		if math.IsNaN(v) {
 			sim[i] = 0
@@ -46,8 +45,8 @@ func TopScores(sim *mat.VecDense, topK int) ([]float64, []int) {
 		topK = len(s)
 	}
 	type scoreIndex struct {
-		score float64
-		index int
+		score float64 // similarity score
+		index int     // index of the vector in the index matrix
 	}
 	si := make([]scoreIndex, len(s))
 	for i, score := range s {

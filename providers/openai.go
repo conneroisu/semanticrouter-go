@@ -19,8 +19,10 @@ func (o *OpenAIEncoder) Encode(utterance string) ([]float32, error) {
 		Input: utterance,
 		Model: openai.AdaEmbeddingV2,
 	}
-	// Create an embedding for the user query
-	queryResponse, err := client.CreateEmbeddings(context.Background(), queryReq)
+	queryResponse, err := client.CreateEmbeddings(
+		context.Background(),
+		queryReq,
+	)
 	if err != nil {
 		log.Fatal("Error creating query embedding:", err)
 	}
