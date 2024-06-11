@@ -18,21 +18,18 @@ func similarityMatrix(xq, index mat.Matrix) *mat.VecDense {
 			xqVec.SetVec(i, xq.At(i, 0))
 		}
 	}
-
 	xqNorm := mat.Norm(xqVec, 2)
 	indexNorm := make([]float64, rows)
 	for i := 0; i < rows; i++ {
 		rowVec := mat.Row(nil, i, index)
 		indexNorm[i] = floats.Norm(rowVec, 2)
 	}
-
 	sim := make([]float64, rows)
 	for i := 0; i < rows; i++ {
 		rowVec := mat.Row(nil, i, index)
 		dot := floats.Dot(rowVec, xqVec.RawVector().Data)
 		sim[i] = dot / (indexNorm[i] * xqNorm)
 	}
-
 	return mat.NewVecDense(rows, sim)
 }
 
