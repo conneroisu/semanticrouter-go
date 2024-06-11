@@ -8,22 +8,6 @@
 
 # if gum is not installed just echo the messages
 
-dbs=(
-	"cse"
-	"logs"
-)
-
 gofmt -w .
 
 golines -w --max-len=79 .
-
-templ fmt .
-
-for db in "${dbs[@]}"; do
-	echo "===== $db ====="
-	cd "./data/""$db" || exit
-	echo "vetting models"
-	sqlc vet
-	echo "^^^^^ $db ^^^^^"
-	cd ../..
-done

@@ -10,25 +10,27 @@ import (
 	"github.com/conneroisu/go-semantic-router/providers"
 )
 
-var PoliticsRoutes = semantic_router.Routes{
+// PoliticsRoutes represents a set of routes that are noteworthy.
+var PoliticsRoutes = semantic_router.Route{
 	Name: "politics",
-	Utterances: []string{
-		"isn't politics the best thing ever",
-		"why don't you tell me about your political opinions",
-		"don't you just love the president",
-		"they're going to destroy this country!",
-		"they will save the country!",
+	Utterances: []semantic_router.Utterance{
+		{Utterance: "isn't politics the best thing ever"},
+		{Utterance: "why don't you tell me about your political opinions"},
+		{Utterance: "don't you just love the president"},
+		{Utterance: "they're going to destroy this country!"},
+		{Utterance: "they will save the country!"},
 	},
 }
 
-var ChitchatRoutes = semantic_router.Routes{
+// ChitchatRoutes represents a set of routes that are noteworthy.
+var ChitchatRoutes = semantic_router.Route{
 	Name: "chitchat",
-	Utterances: []string{
-		"how's the weather today?",
-		"how are things going?",
-		"lovely weather today",
-		"the weather is horrendous",
-		"let's go to the chippy",
+	Utterances: []semantic_router.Utterance{
+		{Utterance: "how's the weather today?"},
+		{Utterance: "how are things going?"},
+		{Utterance: "lovely weather today"},
+		{Utterance: "the weather is horrendous"},
+		{Utterance: "let's go to the chippy"},
 	},
 }
 
@@ -42,17 +44,28 @@ func main() {
 
 // run runs the example.
 func run() error {
-	router := semantic_router.NewRouter(
-		[]semantic_router.Routes{PoliticsRoutes, ChitchatRoutes},
+	println("running")
+	router, err := semantic_router.NewRouter(
+		[]semantic_router.Route{PoliticsRoutes, ChitchatRoutes},
 		providers.OpenAIEncoder{
 			APIKey: os.Getenv("OPENAI_API_KEY"),
-			Model:  "gpt-3.5-turbo",
+			Model:  "text-embedding-3-small",
 		},
 	)
-	finding, err := router.Match("how's the weather today?")
+	if err != nil {
+		return fmt.Errorf("error creating router: %w", err)
+	}
+	finding, p, err := router.Match("how's the weather today?")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
+	fmt.Println("p:", p)
+	fmt.Println("Found:", finding)
+	finding, p, err = router.Match("ain't politics the best thing ever")
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+	fmt.Println("p:", p)
 	fmt.Println("Found:", finding)
 	return nil
 }

@@ -7,36 +7,36 @@ tasks:
       
   clean:
     cmds:
-      - sh ./scripts/taskfile.clean.sh
+      - sh ./scripts/taskfile/clean.sh
       
   fmt:
     cmds:
-    - sh ./scripts/taskfile.fmt.sh
+    - sh ./scripts/taskfile/fmt.sh
 
   lint:
     cmds:
-    - sh ./scripts/taskfile.lint.sh
+    - sh ./scripts/taskfile/lint.sh
 
   test:
     cmds:
-      - sh ./scripts/taskfile.test.sh
+      - sh ./scripts/taskfile/test.sh
         
   database:
     cmds:
-      - sh ./scripts/taskfile.database.sh 
+      - sh ./scripts/taskfile/database.sh 
 
   dev:
     cmds:
-      - sh ./scripts/taskfile.dev.sh
+      - sh ./scripts/taskfile/dev.sh
 
   prod:
     cmds:
-      - sh ./scripts/taskfile.prod.sh
+      - sh ./scripts/taskfile/prod.sh
 
   coverage:
     cmds:
-      - sh ./scripts/taskfile.coverage.sh
+      - sh ./scripts/taskfile/coverage.sh
 
   install:
     cmds:
-      - sh ./scripts/taskfile.install.sh
+      - sh ./scripts/taskfile/install.sh
