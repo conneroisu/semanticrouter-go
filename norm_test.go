@@ -4,6 +4,10 @@ import (
 	"testing"
 )
 
+// TestNormalizeScores tests the NormalizeScores function
+// to ensure that the scores are normalized correctly.
+// It does this testing by comparing the normalized scores
+// with the expected values.
 func TestNormalizeScores(t *testing.T) {
 	testCases := []struct {
 		input    []float64

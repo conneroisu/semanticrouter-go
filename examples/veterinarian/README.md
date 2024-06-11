@@ -1,6 +1,6 @@
 # Veterinarian
 
-An example of a semantic router for a veterinarian's office.
+An example of a semantic router understanding semantic found within a veterinarian's office.
 
 ## Usage
 
