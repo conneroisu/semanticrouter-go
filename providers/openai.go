@@ -7,6 +7,7 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 )
 
+// OpenAIEncoder encodes a query string into an OpenAI embedding.
 type OpenAIEncoder struct {
 	Ctx    context.Context
 	APIKey string

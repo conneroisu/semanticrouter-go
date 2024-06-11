@@ -8,7 +8,7 @@ import (
 
 // GoogleEncoder encodes a query string into a Google search URL.
 type GoogleEncoder struct {
-	ctx context.Context
+	Ctx context.Context
 
 	client genai.Client
 	name   string
@@ -25,7 +25,7 @@ func NewGoogleEncoder(
 // Encode encodes a query string into a Google search URL.
 func (e *GoogleEncoder) Encode(query string) ([]float64, error) {
 	model := e.client.EmbeddingModel(e.name)
-	embedding, err := model.EmbedContent(e.ctx)
+	embedding, err := model.EmbedContent(e.Ctx)
 	if err != nil {
 		return nil, err
 	}

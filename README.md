@@ -89,7 +89,6 @@ Found: chitchat
 ### Veterinarian Example
 
 ```go
-
 package main
 
 import (
@@ -105,11 +104,8 @@ import (
 var NoteworthyRoutes = semantic_router.Route{
 	Name: "noteworthy",
 	Utterances: []semantic_router.Utterance{
-		{Utterance: "how do I train my pet to use a litter box?"},
-		{Utterance: "my pet is drinking a lot of water, is that normal?"},
-		{Utterance: "what are the signs of ear infections in pets?"},
-		{Utterance: "how can I help my pet lose weight?"},
-		{Utterance: "what should I do if my pet is not eating?"},
+		{Utterance: "what is the best way to treat a dog with a cold?"},
+		{Utterance: "my cat has been limping, what should I do?"},
 	},
 }
 
@@ -150,8 +146,6 @@ func run() error {
 
 Output:
 ```bash
-p: 0.999899
-Found: noteworthy
-p: 0.999899
-Found: noteworthy
+Found: chitchat
+p: 0.7631368810166642
 ```
