@@ -6,7 +6,7 @@ SHELLFLAGS = -e
 
 .PHONY: fmt
 fmt:
-	@sh ./scripts/makefile.fmt.sh
+	@sh ./scripts/makefile/fmt.sh
 
 .PHONY: test
 test:
@@ -14,28 +14,28 @@ test:
 
 .PHONY: lint
 lint:
-	@sh ./scripts/makefile.lint.sh
+	@sh ./scripts/makefile/lint.sh
 
 .PHONY: tidy
 tidy:
-	@sh ./scripts/makefile.tidy.sh
+	@sh ./scripts/makefile/tidy.sh
 
 .PHONY: docs
 docs:
-	@sh ./scripts/makefile.docs.sh
+	@sh ./scripts/makefile/docs.sh
 
 .PHONY: testdata
 testdata:
-	@sh ./scripts/makefile.testdata.sh
+	@sh ./scripts/makefile/testdata.sh
 
 .PHONY: release
 release:
-	@sh ./scripts/makefile.release.sh
+	@sh ./scripts/makefile/release.sh
 
 .PHONY: build
 build:
-	@sh ./scripts/makefile.build.sh
+	@sh ./scripts/makefile/build.sh
 
 .PHONY: prod
 prod:
-	@sh ./scripts/makefile.prod.sh
+	@sh ./scripts/makefile/prod.sh
