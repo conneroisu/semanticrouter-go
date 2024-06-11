@@ -26,8 +26,11 @@ func SimilarityMatrix(xq, index mat.Matrix) *mat.VecDense {
 	}
 	sim := make([]float64, rows)
 	for i := 0; i < rows; i++ {
+		// get the row vector from the index matrix
 		rowVec := mat.Row(nil, i, index)
+		// do the dot product of the row vector and the query vector
 		dot := floats.Dot(rowVec, xqVec.RawVector().Data)
+		// compute the similarity score
 		sim[i] = dot / (indexNorm[i] * xqNorm)
 	}
 	for i, v := range sim {

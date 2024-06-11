@@ -1,3 +1,5 @@
+// Package main shows how to use the semantic router to find the best route for a given utterance
+// in the context of a chat bot or other conversational application.
 package main
 
 import (
@@ -30,14 +32,27 @@ var ChitchatRoutes = semantic_router.Routes{
 	},
 }
 
+// main runs the example.
 func main() {
+	if err := run(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
+
+// run runs the example.
+func run() error {
 	router := semantic_router.NewRouter(
 		[]semantic_router.Routes{PoliticsRoutes, ChitchatRoutes},
-		providers.OpenAIEncoder{os.Getenv("OPENAI_API_KEY")},
+		providers.OpenAIEncoder{
+			APIKey: os.Getenv("OPENAI_API_KEY"),
+			Model:  "gpt-3.5-turbo",
+		},
 	)
 	finding, err := router.Match("how's the weather today?")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
 	fmt.Println("Found:", finding)
+	return nil
 }
