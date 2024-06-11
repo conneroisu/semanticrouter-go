@@ -1,7 +1,8 @@
-package main
+package semanticrouter
 
 import (
 	"fmt"
+	"math"
 	"sort"
 
 	"gonum.org/v1/gonum/floats"
@@ -29,6 +30,12 @@ func similarityMatrix(xq, index mat.Matrix) *mat.VecDense {
 		rowVec := mat.Row(nil, i, index)
 		dot := floats.Dot(rowVec, xqVec.RawVector().Data)
 		sim[i] = dot / (indexNorm[i] * xqNorm)
+	}
+	// if a vecot is NaN, it will be replaced by 0
+	for i, v := range sim {
+		if math.IsNaN(v) {
+			sim[i] = 0
+		}
 	}
 	return mat.NewVecDense(rows, sim)
 }
