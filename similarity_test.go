@@ -19,6 +19,7 @@ type testCase struct {
 	expectedSim float64
 }
 
+// TestSimilarityMatrix tests the SimilarityMatrix function
 func TestSimilarityMatrix(t *testing.T) {
 	tests := []testCase{
 		{
