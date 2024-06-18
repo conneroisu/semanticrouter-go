@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
 
 	_ "github.com/asg017/sqlite-vss/bindings/go"
 	"github.com/bytedance/sonic"
@@ -11,15 +12,28 @@ import (
 	"github.com/uptrace/bun"
 )
 
-// SqliteStore stores a value in the database
-type SqliteStore struct {
-	Database     *bun.DB
-	SQLSetupFunc func(db *bun.DB) error
+// SQLStore stores a value in a sql database
+//
+// Dialects supported: sqlite, mysql, postgres, mssql
+type SQLStore struct {
+	// WriteMutex is an optional mutex that can be used to lock the database for writing
+	WriteMutex *sync.Mutex
+
+	// Database is the database connection
+	Database *bun.DB
+
+	// SetupFunc is a function that is called when the database is initialized
+	SetupFunc func(db *bun.DB) error
 }
 
 // Store stores a value in the database
-func (s *SqliteStore) Store(ctx context.Context, key string, value []float64) error {
+func (s *SQLStore) Store(ctx context.Context, key string, value []float64) error {
+	if s.WriteMutex != nil {
+		s.WriteMutex.Lock()
+		defer s.WriteMutex.Unlock()
+	}
 	var err error
+
 	var embedding []byte
 	embedding, err = sonic.Marshal(value)
 	if err != nil {
@@ -45,7 +59,7 @@ func (s *SqliteStore) Store(ctx context.Context, key string, value []float64) er
 }
 
 // Get retrieves a value from the Database
-func (s *SqliteStore) Get(ctx context.Context, key string) ([]float64, error) {
+func (s *SQLStore) Get(ctx context.Context, key string) ([]float64, error) {
 	var embedding []float64
 	var utterance domain.Utterance
 	var err error
