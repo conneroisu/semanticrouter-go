@@ -7,7 +7,7 @@ import (
 	"os"
 
 	semantic_router "github.com/conneroisu/go-semantic-router"
-	"github.com/conneroisu/go-semantic-router/providers"
+	"github.com/conneroisu/go-semantic-router/encoders"
 )
 
 // PoliticsRoutes represents a set of routes that are noteworthy.
@@ -46,7 +46,7 @@ func main() {
 func run() error {
 	router, err := semantic_router.NewRouter(
 		[]semantic_router.Route{PoliticsRoutes, ChitchatRoutes},
-		providers.OpenAIEncoder{
+		encoders.OpenAIEncoder{
 			APIKey: os.Getenv("OPENAI_API_KEY"),
 			Model:  "text-embedding-3-small",
 		},

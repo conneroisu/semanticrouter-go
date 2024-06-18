@@ -1,6 +1,7 @@
 package semantic_router
 
 import (
+	"context"
 	"fmt"
 	"log"
 
@@ -15,6 +16,7 @@ import (
 type Router struct {
 	Routes  []Route `json:"routes" yaml:"routes" toml:"routes"`    // Routes is a slice of Routes.
 	Encoder Encoder `json:"encoder" yaml:"encoder" toml:"encoder"` // Encoder is an Encoder that encodes utterances into vectors.
+	Storage Store   `json:"storage" yaml:"storage" toml:"storage"` // Storage is a Store that stores the utterances.
 }
 
 // Route represents a route in the semantic router.
@@ -43,24 +45,37 @@ type Encoder interface {
 // and stores it in a some sort of data store, and a method, Get, which takes a
 // string and returns a []float64 from the data store.
 type Store interface {
-	Store([]Utterance) error
-	Get(string) ([]float64, error)
+	Store(ctx context.Context, utterance Utterance) error
+	Get(ctx context.Context, utterance string) ([]float64, error)
 }
 
 // NewRouter creates a new semantic router.
-func NewRouter(routes []Route, encoder Encoder) (*Router, error) {
+func NewRouter(routes []Route, encoder Encoder, store Store) (*Router, error) {
 	routesLen := len(routes)
+	ctx := context.Background()
 	for i := 0; i < routesLen; i++ {
 		route := routes[i]
 		utters := route.Utterances
-		utterLen := len(utters)
-		for j := 0; j < utterLen; j++ {
-			utter := utters[j]
+		for j, utter := range utters {
+			embedding, err := store.Get(ctx, utter.Utterance)
+			if err == nil {
+				route.Utterances[j].Embedding = embedding
+				continue
+			}
 			colVec, err := encoder.Encode(utter.Utterance)
 			if err != nil {
 				return nil,
 					fmt.Errorf(
 						"error encoding utterance: %s: %w",
+						utter.Utterance,
+						err,
+					)
+			}
+			err = store.Store(ctx, utter)
+			if err != nil {
+				return nil,
+					fmt.Errorf(
+						"error storing utterance: %s: %w",
 						utter.Utterance,
 						err,
 					)
@@ -75,6 +90,7 @@ func NewRouter(routes []Route, encoder Encoder) (*Router, error) {
 }
 
 // Match returns the route that matches the given utterance.
+// The score is the similarity score between the query vector and the index vector.
 func (r *Router) Match(utterance string) (string, float64, error) {
 	encoding, err := r.Encoder.Encode(utterance)
 	if err != nil {
@@ -95,7 +111,6 @@ func (r *Router) Match(utterance string) (string, float64, error) {
 			}
 			indexVec := mat.NewVecDense(len(ut.Embedding), ut.Embedding)
 			simScore := SimilarityMatrix(queryVec, indexVec)
-
 			if simScore > bestScore {
 				bestScore = simScore
 				bestRouteName = route.Name
