@@ -1,4 +1,4 @@
-package stores
+package sql
 
 import (
 	"context"
@@ -12,10 +12,10 @@ import (
 	"github.com/uptrace/bun"
 )
 
-// SQLStore stores a value in a sql database
+// Store stores a value in a sql database
 //
 // Dialects supported: sqlite, mysql, postgres, mssql
-type SQLStore struct {
+type Store struct {
 	// WriteMutex is an optional mutex that can be used to lock the database for writing
 	WriteMutex *sync.Mutex
 
@@ -27,7 +27,7 @@ type SQLStore struct {
 }
 
 // Store stores a value in the database
-func (s *SQLStore) Store(ctx context.Context, key string, value []float64) error {
+func (s *Store) Store(ctx context.Context, key string, value []float64) error {
 	if s.WriteMutex != nil {
 		s.WriteMutex.Lock()
 		defer s.WriteMutex.Unlock()
@@ -59,7 +59,7 @@ func (s *SQLStore) Store(ctx context.Context, key string, value []float64) error
 }
 
 // Get retrieves a value from the Database
-func (s *SQLStore) Get(ctx context.Context, key string) ([]float64, error) {
+func (s *Store) Get(ctx context.Context, key string) ([]float64, error) {
 	var embedding []float64
 	var utterance domain.Utterance
 	var err error

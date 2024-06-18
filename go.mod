@@ -3,10 +3,10 @@ module github.com/conneroisu/go-semantic-router
 go 1.22.0
 
 require (
-	github.com/asg017/sqlite-vss/bindings/go v0.0.0-20240505200016-8d3c6ff2fca6
 	github.com/bytedance/sonic v1.11.8
 	github.com/google/generative-ai-go v0.14.0
 	github.com/minio/minio-go/v7 v7.0.71
+	github.com/redis/go-redis/v9 v9.5.3
 	github.com/sashabaranov/go-openai v1.24.1
 	github.com/uptrace/bun v1.2.1
 	gonum.org/v1/gonum v0.14.0
@@ -20,8 +20,10 @@ require (
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	cloud.google.com/go/longrunning v0.5.7 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
