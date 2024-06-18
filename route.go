@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/conneroisu/go-semantic-router/domain"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -23,14 +24,8 @@ type Router struct {
 //
 // It is a struct that contains a name and a slice of Utterances.
 type Route struct {
-	Name       string      `json:"name"       yaml:"name"       toml:"name"`       // Name is the name of the route.
-	Utterances []Utterance `json:"utterances" yaml:"utterances" toml:"utterances"` // Utterances is a slice of Utterances.
-}
-
-// Utterance represents a utterance in the semantic router.
-type Utterance struct {
-	Utterance string    `json:"utterance" yaml:"utterance" toml:"utterance"` // Utterance is the utterance.
-	Embedding []float64 `json:"embedding" yaml:"embedding" toml:"embedding"` // Embedding is the embedding of the utterance.
+	Name       string             `json:"name"       yaml:"name"       toml:"name"`       // Name is the name of the route.
+	Utterances []domain.Utterance `json:"utterances" yaml:"utterances" toml:"utterances"` // Utterances is a slice of Utterances.
 }
 
 // Encoder represents a encoding driver in the semantic router.
@@ -45,7 +40,7 @@ type Encoder interface {
 // and stores it in a some sort of data store, and a method, Get, which takes a
 // string and returns a []float64 from the data store.
 type Store interface {
-	Store(ctx context.Context, utterance Utterance) error
+	Store(ctx context.Context, utterance domain.Utterance) error
 	Get(ctx context.Context, utterance string) ([]float64, error)
 }
 
