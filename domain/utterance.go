@@ -16,8 +16,8 @@ type Utterance struct {
 	Utterance string `bun:"utterance"` // Utterance is the utterance.
 	// EmbeddingBytes is the embedding of the utterance.
 	EmbeddingBytes []byte `bun:"embedding" json:"embedding"` // Embedding is the embedding of the utterance.
-	// embedding is the embedding of the utterance.
-	embedding Embedding
+	// Embed is the Embed of the utterance.
+	Embed Embedding
 }
 
 // UtterancePrime represents a utterance in the semantic router.

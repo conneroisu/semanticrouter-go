@@ -54,14 +54,13 @@ func (s *SqliteStore) Get(ctx context.Context, key string) ([]float64, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error getting value: %w", err)
 	}
-	if utterance.Embedding == nil {
-		var em interface{}
-		_, err = s.Database.NewSelect().Model(&em).
-			Where("utterance = ?", key).Exec(ctx)
+	if utterance.Embed == nil {
+		var em domain.Embedding
+		em, err = utterance.Embedding()
 		if err != nil {
-			return nil, fmt.Errorf("error getting value: %w", err)
+			return nil, fmt.Errorf("error unmarshaling embedding: %w", err)
 		}
-		embedding = em.([]float64)
+		embedding = em
 	}
 	return embedding, nil
 }
