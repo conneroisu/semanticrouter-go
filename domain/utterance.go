@@ -1,10 +1,12 @@
 package domain
 
 import (
-	"github.com/bytedance/sonic"
+	"encoding/json"
+
 	"github.com/uptrace/bun"
 )
 
+// Embedding is the embedding of some text, speech, or other data (images, videos, etc.).
 type Embedding []float64
 
 // Utterance represents a utterance in the semantic router.
@@ -31,7 +33,7 @@ func (u *Utterance) Embedding() (Embedding, error) {
 		Embedding []float64 `json:"embedding"`
 	}
 	var embedding Embedding
-	err := sonic.Unmarshal(u.EmbeddingBytes, &embedding)
+	err := json.Unmarshal(u.EmbeddingBytes, &embedding)
 	if err != nil {
 		return nil, err
 	}
