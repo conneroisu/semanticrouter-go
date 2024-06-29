@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -46,6 +47,7 @@ func main() {
 
 // run runs the example.
 func run() error {
+	ctx := context.Background()
 	store := memory.NewStore()
 
 	router, err := semantic_router.NewRouter(
@@ -59,13 +61,13 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("error creating router: %w", err)
 	}
-	finding, p, err := router.Match("how's the weather today?")
+	finding, p, err := router.Match(ctx, "how's the weather today?")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
 	fmt.Println("p:", p)
 	fmt.Println("Found:", finding)
-	finding, p, err = router.Match("ain't politics the best thing ever")
+	finding, p, err = router.Match(ctx, "ain't politics the best thing ever")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}

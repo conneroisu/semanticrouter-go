@@ -3,6 +3,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -43,16 +44,19 @@ func main() {
 
 // run runs the example.
 func run() error {
-	store := memory.NewStore()
+	ctx := context.Background()
 	cli, err := api.ClientFromEnvironment()
+	if err != nil {
+		return err
+	}
 	router, err := semantic_router.NewRouter(
 		[]semantic_router.Route{NoteworthyRoutes, ChitchatRoutes},
 		&ollama.Encoder{
 			Client: cli,
 		},
-		store,
+		memory.NewStore(),
 	)
-	finding, p, err := router.Match("how's the weather today?")
+	finding, p, err := router.Match(ctx, "how's the weather today?")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}

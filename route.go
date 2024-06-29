@@ -44,16 +44,20 @@ type Store interface {
 }
 
 // NewRouter creates a new semantic router.
-func NewRouter(routes []Route, encoder Encoder, store Store) (*Router, error) {
+func NewRouter(routes []Route, encoder Encoder, store Store) (router *Router, err error) {
 	routesLen := len(routes)
 	ctx := context.Background()
 	for i := 0; i < routesLen; i++ {
 		route := routes[i]
 		utters := route.Utterances
 		for _, utter := range utters {
-			embedding, err := store.Get(ctx, utter.Utterance)
-			if err == nil && len(embedding) != 0 {
-				continue
+			en, err := encoder.Encode(utter.Utterance)
+			if err != nil {
+				return nil, fmt.Errorf("error encoding utterance: %w", err)
+			}
+			err = utter.SetEmbedding(en)
+			if err != nil {
+				return nil, fmt.Errorf("error encoding utterance: %w", err)
 			}
 			err = store.Store(ctx, utter)
 			if err != nil {
@@ -74,18 +78,22 @@ func NewRouter(routes []Route, encoder Encoder, store Store) (*Router, error) {
 }
 
 // Match returns the route that matches the given utterance.
+//
 // The score is the similarity score between the query vector and the index vector.
-func (r *Router) Match(utterance string) (string, float64, error) {
+//
+// If the given context is canceled, the context's error is returned if it is non-nil.
+func (r *Router) Match(
+	ctx context.Context,
+	utterance string,
+) (bestRouteName string, bestScore float64, err error) {
 	encoding, err := r.Encoder.Encode(utterance)
 	if err != nil {
 		return "", 0.0, fmt.Errorf("error encoding utterance: %w", err)
 	}
-	bestScore := 0.0
-	var bestRouteName string
 	queryVec := mat.NewVecDense(len(encoding), encoding)
 	for _, route := range r.Routes {
 		for _, ut := range route.Utterances {
-			em, err := ut.Embedding()
+			em, err := r.Storage.Get(ctx, ut.Utterance)
 			if err != nil {
 				return "", 0.0, fmt.Errorf("error getting embedding: %w", err)
 			}
