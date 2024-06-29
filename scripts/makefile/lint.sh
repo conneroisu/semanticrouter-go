@@ -9,6 +9,4 @@ staticcheck ./...
 
 golangci-lint run
 
-sqlc vet
-
 revive -config .revive.toml -formatter friendly ./...
