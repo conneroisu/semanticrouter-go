@@ -1,9 +1,8 @@
-package semantic_router
+package semanticrouter
 
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/conneroisu/go-semantic-router/domain"
 	"gonum.org/v1/gonum/mat"
@@ -51,13 +50,12 @@ func NewRouter(routes []Route, encoder Encoder, store Store) (*Router, error) {
 	for i := 0; i < routesLen; i++ {
 		route := routes[i]
 		utters := route.Utterances
-		for j, utter := range utters {
+		for _, utter := range utters {
 			embedding, err := store.Get(ctx, utter.Utterance)
-			if err == nil {
-				route.Utterances[j].Embedding = embedding
+			if err == nil && len(embedding) != 0 {
 				continue
 			}
-			colVec, err := encoder.Encode(utter.Utterance)
+			_, err = encoder.Encode(utter.Utterance)
 			if err != nil {
 				return nil,
 					fmt.Errorf(
@@ -75,7 +73,6 @@ func NewRouter(routes []Route, encoder Encoder, store Store) (*Router, error) {
 						err,
 					)
 			}
-			route.Utterances[j].Embedding = colVec
 		}
 	}
 	return &Router{
@@ -96,15 +93,15 @@ func (r *Router) Match(utterance string) (string, float64, error) {
 	queryVec := mat.NewVecDense(len(encoding), encoding)
 	for _, route := range r.Routes {
 		for _, ut := range route.Utterances {
-			if len(ut.Embedding) != queryVec.Len() {
-				log.Printf(
-					"Embedding length mismatch: queryVec.Len() = %d, ut.Embedding.Len() = %d",
-					queryVec.Len(),
-					len(ut.Embedding),
-				)
+			em, err := ut.Embedding()
+			if err != nil {
+				return "", 0.0, fmt.Errorf("error getting embedding: %w", err)
+			}
+			emLen := len(em)
+			if emLen != queryVec.Len() {
 				continue
 			}
-			indexVec := mat.NewVecDense(len(ut.Embedding), ut.Embedding)
+			indexVec := mat.NewVecDense(emLen, em)
 			simScore := SimilarityMatrix(queryVec, indexVec)
 			if simScore > bestScore {
 				bestScore = simScore

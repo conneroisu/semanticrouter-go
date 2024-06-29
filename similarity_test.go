@@ -1,4 +1,4 @@
-package semantic_router
+package semanticrouter
 
 import (
 	"fmt"
