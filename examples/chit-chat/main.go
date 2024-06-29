@@ -4,15 +4,12 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	semantic_router "github.com/conneroisu/go-semantic-router"
 	"github.com/conneroisu/go-semantic-router/domain"
-
-	"github.com/conneroisu/go-semantic-router/encoders"
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
+	encoders "github.com/conneroisu/go-semantic-router/encoders/openai"
+	"github.com/conneroisu/go-semantic-router/stores/memory"
 )
 
 // PoliticsRoutes represents a set of routes that are noteworthy.
@@ -49,25 +46,15 @@ func main() {
 
 // run runs the example.
 func run() error {
-	endpoint := "play.min.io"
-	accessKeyID := "Q3AM3UQ867SPQQA43P2F"
-	secretAccessKey := "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG"
-	useSSL := true
+	store := memory.NewStore()
 
-	// Initialize minio client object.
-	minioClient, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),
-		Secure: useSSL,
-	})
-	if err != nil {
-		log.Fatalln(err)
-	}
 	router, err := semantic_router.NewRouter(
 		[]semantic_router.Route{PoliticsRoutes, ChitchatRoutes},
 		encoders.OpenAIEncoder{
 			APIKey: os.Getenv("OPENAI_API_KEY"),
 			Model:  "text-embedding-3-small",
 		},
+		store,
 	)
 	if err != nil {
 		return fmt.Errorf("error creating router: %w", err)

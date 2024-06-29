@@ -32,6 +32,7 @@ import (
 	"os"
 
 	semantic_router "github.com/conneroisu/go-semantic-router"
+	"github.com/conneroisu/go-semantic-router/stores/memory"
 	"github.com/conneroisu/go-semantic-router/encoders"
 )
 
@@ -63,12 +64,14 @@ func main() {
 
 // run runs the example.
 func run() error {
+	store := memory.NewStore()
 	router, err := semantic_router.NewRouter(
 		[]semantic_router.Route{NoteworthyRoutes, ChitchatRoutes},
 		encoders.OpenAIEncoder{
 			APIKey: os.Getenv("OPENAI_API_KEY"),
 			Model:  "text-embedding-3-small",
 		},
+		store,
 	)
 	finding, p, err := router.Match("how's the weather today?")
 	if err != nil {
@@ -96,6 +99,7 @@ import (
 	"os"
 
 	semantic_router "github.com/conneroisu/go-semantic-router"
+	"github.com/conneroisu/go-semantic-router/stores/memory"
 	"github.com/conneroisu/go-semantic-router/providers"
 )
 
@@ -127,12 +131,14 @@ func main() {
 
 // run runs the example.
 func run() error {
+	store := memory.NewStore()
 	router, err := semantic_router.NewRouter(
 		[]semantic_router.Route{NoteworthyRoutes, ChitchatRoutes},
 		encoders.OpenAIEncoder{
 			APIKey: os.Getenv("OPENAI_API_KEY"),
 			Model:  "text-embedding-3-small",
 		},
+		store,
 	)
 	finding, p, err := router.Match("how's the weather today?")
 	if err != nil {

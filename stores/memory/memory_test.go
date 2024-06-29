@@ -2,21 +2,23 @@ package memory
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
+	"github.com/conneroisu/go-semantic-router/domain"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestStore(t *testing.T) {
 	ctx := context.Background()
 	store := NewStore()
-	val, err := store.Set(
+	utter := domain.Utterance{
+		Utterance: "key",
+	}
+	utter.SetEmbedding([]float64{1.0, 2.0, 3.0, 4.0, 5.0})
+	err := store.Store(
 		ctx,
-		"key",
-		[]float64{1.0, 2.0, 3.0, 4.0, 5.0},
+		utter,
 	)
-	t.Log(fmt.Sprintf("val: %v", val))
 	assert.NoError(t, err)
 
 	floats, err := store.Get(ctx, "key")

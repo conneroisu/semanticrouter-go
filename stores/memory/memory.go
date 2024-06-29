@@ -3,6 +3,8 @@ package memory
 import (
 	"context"
 	"fmt"
+
+	"github.com/conneroisu/go-semantic-router/domain"
 )
 
 // Store is a simple key-value store for embeddings.
@@ -17,7 +19,7 @@ func NewStore() *Store {
 
 // Get gets a value from the
 func (s *Store) Get(
-	ctx context.Context,
+	_ context.Context,
 	utterance string,
 ) (embedding []float64, err error) {
 	embedding, ok := s.store[utterance]
@@ -27,12 +29,15 @@ func (s *Store) Get(
 	return embedding, nil
 }
 
-// Set sets a value in the store
-func (s *Store) Set(
-	ctx context.Context,
-	utterance string,
-	value []float64,
-) (string, error) {
-	s.store[utterance] = value
-	return utterance, nil
+// Store sets a value in the store
+func (s *Store) Store(
+	_ context.Context,
+	utterance domain.Utterance,
+) error {
+	var err error
+	s.store[utterance.Utterance], err = utterance.Embedding()
+	if err != nil {
+		return fmt.Errorf("error getting embedding: %w", err)
+	}
+	return nil
 }
