@@ -78,6 +78,7 @@ func NewRouter(routes []Route, encoder Encoder, store Store) (*Router, error) {
 	return &Router{
 		Routes:  routes,
 		Encoder: encoder,
+		Storage: store,
 	}, nil
 }
 
