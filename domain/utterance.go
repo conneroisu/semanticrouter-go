@@ -43,11 +43,11 @@ func (u *Utterance) Embedding() (Embedding, error) {
 
 // SetEmbedding sets the embedding of the utterance.
 func (u *Utterance) SetEmbedding(embedding []float64) error {
-	type Embedding struct {
+	type E struct {
 		Embedding []float64 `json:"embedding"`
 	}
 	var embeddingBytes []byte
-	embeddingBytes, err := json.Marshal(Embedding{Embedding: embedding})
+	embeddingBytes, err := json.Marshal(E{Embedding: embedding})
 	if err != nil {
 		return fmt.Errorf("error marshaling embedding: %w", err)
 	}

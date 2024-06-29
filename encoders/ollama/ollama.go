@@ -13,6 +13,7 @@ import (
 // Encoder is an encoder using Ollama models.
 type Encoder struct {
 	Client *api.Client
+	Model  string
 }
 
 // NewEncoder creates a new Encoder.
@@ -23,7 +24,7 @@ func NewEncoder(client *api.Client) *Encoder {
 // Encode encodes a query string into a Ollama embedding.
 func (e *Encoder) Encode(query string) (result []float64, err error) {
 	req := &api.EmbeddingRequest{
-		Model:  "mxbai-embed-large",
+		Model:  e.Model,
 		Prompt: query,
 	}
 	ctx := context.Background()

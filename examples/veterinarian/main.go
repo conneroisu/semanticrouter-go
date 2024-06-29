@@ -53,6 +53,7 @@ func run() error {
 		[]semantic_router.Route{NoteworthyRoutes, ChitchatRoutes},
 		&ollama.Encoder{
 			Client: cli,
+			Model:  "mxbai-embed-large",
 		},
 		memory.NewStore(),
 	)
