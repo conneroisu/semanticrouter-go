@@ -8,8 +8,16 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
-type MinioStore struct {
+type Store struct {
 	Client *minio.Client
+}
+
+func (s *Store) Store(ctx context.Context, utterance string, value []float64) error {
+	return nil
+}
+
+func (s *Store) Get(ctx context.Context, utterance string) ([]float64, error) {
+	return nil, nil
 }
 
 func main() {

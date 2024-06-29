@@ -1,9 +1,13 @@
 package valkey
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 
+	"github.com/conneroisu/go-semantic-router/domain"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -12,44 +16,48 @@ type Store struct {
 	rds *redis.Client
 }
 
+// NewStore creates a new Store from a redis client.
+func NewStore(rds *redis.Client) *Store {
+	return &Store{rds: rds}
+}
+
 // Get gets a value from the
-func (s *Store) Get(ctx context.Context, utterance string) ([]float64, error) {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
-
-	val, err := s.rds.Get(ctx, "key").Result()
+func (s *Store) Get(
+	ctx context.Context,
+	utterance string,
+) (embedding []float64, err error) {
+	cmd := s.rds.Get(ctx, utterance)
+	val, err := cmd.Result()
 	if err != nil {
-		panic(err)
+		if errors.Is(err, redis.Nil) {
+			fmt.Println("key2 does not exist")
+			fmt.Println(err)
+			return nil, fmt.Errorf("key does not exist: %w", err)
+		}
+		return nil, err
 	}
-	fmt.Println("key", val)
-
-	val2, err := rdb.Get(ctx, "key2").Result()
-	if err == redis.Nil {
-		fmt.Println("key2 does not exist")
-	} else if err != nil {
-		panic(err)
-	} else {
-		fmt.Println("key2", val2)
+	var utPr domain.UtterancePrime
+	err = json.Unmarshal(bytes.NewBufferString(val).Bytes(), &utPr)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling embedding: %w", err)
 	}
-	// Output: key value
-	// key2 does not exist
+	return utPr.Embedding, nil
 }
 
 // Set sets a value in the store
-func (s *Store) Set(ctx context.Context, utterance string, value []float64) error {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
-
-	err := rdb.Set(ctx, key, value, 0).Err()
+func (s *Store) Set(
+	ctx context.Context,
+	utterance string,
+	value []float64,
+) (string, error) {
+	val, err := json.Marshal(domain.UtterancePrime{Embedding: value})
 	if err != nil {
-		panic(err)
+		return "", fmt.Errorf("error marshaling embedding: %w", err)
 	}
-
-	return nil
+	cmd := s.rds.Set(ctx, utterance, string(val), 0)
+	err = cmd.Err()
+	if err != nil {
+		return "", err
+	}
+	return string(val), nil
 }
