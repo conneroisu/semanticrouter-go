@@ -30,10 +30,10 @@ type UtterancePrime struct {
 
 // Embedding returns the embedding of the utterance.
 func (u *Utterance) Embedding() (Embedding, error) {
-	type Embedding struct {
+	type E struct {
 		Embedding []float64 `json:"embedding"`
 	}
-	var embedding Embedding
+	var embedding E
 	err := json.Unmarshal(u.EmbeddingBytes, &embedding)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshaling embedding: %w", err)
