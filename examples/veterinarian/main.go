@@ -8,8 +8,9 @@ import (
 
 	semantic_router "github.com/conneroisu/go-semantic-router"
 	"github.com/conneroisu/go-semantic-router/domain"
-	encoders "github.com/conneroisu/go-semantic-router/encoders/openai"
+	"github.com/conneroisu/go-semantic-router/encoders/ollama"
 	"github.com/conneroisu/go-semantic-router/stores/memory"
+	"github.com/ollama/ollama/api"
 )
 
 // NoteworthyRoutes represents a set of routes that are noteworthy.
@@ -43,11 +44,11 @@ func main() {
 // run runs the example.
 func run() error {
 	store := memory.NewStore()
+	cli, err := api.ClientFromEnvironment()
 	router, err := semantic_router.NewRouter(
 		[]semantic_router.Route{NoteworthyRoutes, ChitchatRoutes},
-		encoders.OpenAIEncoder{
-			APIKey: os.Getenv("OPENAI_API_KEY"),
-			Model:  "text-embedding-3-small",
+		&ollama.Encoder{
+			Client: cli,
 		},
 		store,
 	)

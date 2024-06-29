@@ -7,13 +7,14 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.57.1
 	github.com/google/generative-ai-go v0.14.0
 	github.com/minio/minio-go/v7 v7.0.71
+	github.com/ollama/ollama v0.1.48
 	github.com/redis/go-redis/v9 v9.5.3
 	github.com/sashabaranov/go-openai v1.24.1
 	github.com/stretchr/testify v1.9.0
 	github.com/testcontainers/testcontainers-go v0.31.0
 	github.com/testcontainers/testcontainers-go/modules/minio v0.31.0
 	github.com/uptrace/bun v1.2.1
-	gonum.org/v1/gonum v0.14.0
+	gonum.org/v1/gonum v0.15.0
 )
 
 require (
@@ -69,7 +70,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.12.4 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/klauspost/compress v1.17.6 // indirect
-	github.com/klauspost/cpuid/v2 v2.2.6 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect

@@ -55,15 +55,6 @@ func NewRouter(routes []Route, encoder Encoder, store Store) (*Router, error) {
 			if err == nil && len(embedding) != 0 {
 				continue
 			}
-			_, err = encoder.Encode(utter.Utterance)
-			if err != nil {
-				return nil,
-					fmt.Errorf(
-						"error encoding utterance: %s: %w",
-						utter.Utterance,
-						err,
-					)
-			}
 			err = store.Store(ctx, utter)
 			if err != nil {
 				return nil,
