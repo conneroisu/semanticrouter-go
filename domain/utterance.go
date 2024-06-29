@@ -2,6 +2,7 @@ package domain
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/uptrace/bun"
 )
@@ -15,9 +16,9 @@ type Utterance struct {
 	// ID is the ID of the utterance.
 	ID int `bun:"id,pk,autoincrement"`
 	// Utterance is the utterance.
-	Utterance string `bun:"utterance"` // Utterance is the utterance.
+	Utterance string `bun:"utterance"`
 	// EmbeddingBytes is the embedding of the utterance.
-	EmbeddingBytes []byte `bun:"embedding" json:"embedding"` // Embedding is the embedding of the utterance.
+	EmbeddingBytes []byte `bun:"embedding" json:"embedding"`
 	// Embed is the Embed of the utterance.
 	Embed Embedding
 }
@@ -35,7 +36,7 @@ func (u *Utterance) Embedding() (Embedding, error) {
 	var embedding Embedding
 	err := json.Unmarshal(u.EmbeddingBytes, &embedding)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error unmarshaling embedding: %w", err)
 	}
 	return embedding.Embedding, nil
 }
@@ -48,7 +49,7 @@ func (u *Utterance) SetEmbedding(embedding []float64) error {
 	var embeddingBytes []byte
 	embeddingBytes, err := json.Marshal(Embedding{Embedding: embedding})
 	if err != nil {
-		return err
+		return fmt.Errorf("error marshaling embedding: %w", err)
 	}
 	u.EmbeddingBytes = embeddingBytes
 	return nil
