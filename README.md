@@ -22,6 +22,18 @@ go get github.com/conneroisu/go-semantic-router
 
 ## Usage
 
+### OpenAI Encoder
+
+```bash
+go get github.com/conneroisu/go-semantic-router/encoders/openai
+```
+
+### Google Encoder
+
+
+### Ollama Encoder
+
+
 ### Conversational Agents Example
 
 ```go
@@ -91,31 +103,44 @@ Found: chitchat
 
 ### Veterinarian Example
 
+The following example shows how to use the semantic router to find the best route for a given utterance in the context of a veterinarian appointment.
+
+The goal of the example is to decide whether spoken utterances are relevant to a noteworthy conversation or a chitchat conversation.
+
+
+#### The Code Example:
 ```go
+// Package main shows how to use the semantic router to find the best route for a given utterance
+// in the context of a veterinarian appointment.
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
 	semantic_router "github.com/conneroisu/go-semantic-router"
+	"github.com/conneroisu/go-semantic-router/domain"
+	"github.com/conneroisu/go-semantic-router/encoders/ollama"
 	"github.com/conneroisu/go-semantic-router/stores/memory"
-	"github.com/conneroisu/go-semantic-router/providers"
+	"github.com/ollama/ollama/api"
 )
 
 // NoteworthyRoutes represents a set of routes that are noteworthy.
 // noteworthy here means that the routes are likely to be relevant to a noteworthy conversation in a veterinarian appointment.
 var NoteworthyRoutes = semantic_router.Route{
 	Name: "noteworthy",
-	Utterances: []semantic_router.Utterance{
+	Utterances: []domain.Utterance{
 		{Utterance: "what is the best way to treat a dog with a cold?"},
 		{Utterance: "my cat has been limping, what should I do?"},
 	},
 }
 
+// ChitchatRoutes represents a set of routes that are chitchat.
+// chitchat here means that the routes are likely to be relevant to a chitchat conversation in a veterinarian appointment.
 var ChitchatRoutes = semantic_router.Route{
 	Name: "chitchat",
-	Utterances: []semantic_router.Utterance{
+	Utterances: []domain.Utterance{
 		{Utterance: "what is your favorite color?"},
 		{Utterance: "what is your favorite animal?"},
 	},
@@ -131,16 +156,20 @@ func main() {
 
 // run runs the example.
 func run() error {
-	store := memory.NewStore()
+	ctx := context.Background()
+	cli, err := api.ClientFromEnvironment()
+	if err != nil {
+		return err
+	}
 	router, err := semantic_router.NewRouter(
 		[]semantic_router.Route{NoteworthyRoutes, ChitchatRoutes},
-		encoders.OpenAIEncoder{
-			APIKey: os.Getenv("OPENAI_API_KEY"),
-			Model:  "text-embedding-3-small",
+		&ollama.Encoder{
+			Client: cli,
+			Model:  "mxbai-embed-large",
 		},
-		store,
+		memory.NewStore(),
 	)
-	finding, p, err := router.Match("how's the weather today?")
+	finding, p, err := router.Match(ctx, "how's the weather today?")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
@@ -150,8 +179,10 @@ func run() error {
 }
 ```
 
-Output:
+#### The Output
+
+The output of the veterinarian example is:
 ```bash
 Found: chitchat
-p: 0.7631368810166642
+p: 0.4656368810166642
 ```

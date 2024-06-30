@@ -51,7 +51,10 @@ func run() error {
 	store := memory.NewStore()
 
 	router, err := semantic_router.NewRouter(
-		[]semantic_router.Route{PoliticsRoutes, ChitchatRoutes},
+		[]semantic_router.Route{
+			PoliticsRoutes,
+			ChitchatRoutes,
+		},
 		encoders.OpenAIEncoder{
 			APIKey: os.Getenv("OPENAI_API_KEY"),
 			Model:  "text-embedding-3-small",
@@ -61,16 +64,12 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("error creating router: %w", err)
 	}
+
 	finding, p, err := router.Match(ctx, "how's the weather today?")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
-	fmt.Println("p:", p)
-	fmt.Println("Found:", finding)
-	finding, p, err = router.Match(ctx, "ain't politics the best thing ever")
-	if err != nil {
-		fmt.Println("Error:", err)
-	}
+
 	fmt.Println("p:", p)
 	fmt.Println("Found:", finding)
 	return nil
