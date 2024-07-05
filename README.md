@@ -24,14 +24,21 @@ go get github.com/conneroisu/go-semantic-router
 
 ### OpenAI Encoder
 
-```bash
-go get github.com/conneroisu/go-semantic-router/encoders/openai
+```go
+import "github.com/conneroisu/go-semantic-router/encoders/openai"
 ```
 
 ### Google Encoder
 
+```go
+import "github.com/conneroisu/go-semantic-router/encoders/google"
+```
 
 ### Ollama Encoder
+
+```go
+import "github.com/conneroisu/go-semantic-router/encoders/ollama"
+```
 
 
 ### Conversational Agents Example
