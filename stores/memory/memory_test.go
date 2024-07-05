@@ -4,14 +4,14 @@ import (
 	"context"
 	"testing"
 
-	"github.com/conneroisu/go-semantic-router/domain"
+	semanticrouter "github.com/conneroisu/go-semantic-router"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestStore(t *testing.T) {
 	ctx := context.Background()
 	store := NewStore()
-	utter := domain.Utterance{
+	utter := semanticrouter.Utterance{
 		Utterance: "key",
 	}
 	utter.SetEmbedding([]float64{1.0, 2.0, 3.0, 4.0, 5.0})

@@ -8,7 +8,6 @@ import (
 	"os"
 
 	semantic_router "github.com/conneroisu/go-semantic-router"
-	"github.com/conneroisu/go-semantic-router/domain"
 	encoders "github.com/conneroisu/go-semantic-router/encoders/openai"
 	"github.com/conneroisu/go-semantic-router/stores/memory"
 )
@@ -16,7 +15,7 @@ import (
 // PoliticsRoutes represents a set of routes that are noteworthy.
 var PoliticsRoutes = semantic_router.Route{
 	Name: "politics",
-	Utterances: []domain.Utterance{
+	Utterances: []semantic_router.Utterance{
 		{Utterance: "isn't politics the best thing ever"},
 		{Utterance: "why don't you tell me about your political opinions"},
 		{Utterance: "don't you just love the president"},
@@ -28,7 +27,7 @@ var PoliticsRoutes = semantic_router.Route{
 // ChitchatRoutes represents a set of routes that are noteworthy.
 var ChitchatRoutes = semantic_router.Route{
 	Name: "chitchat",
-	Utterances: []domain.Utterance{
+	Utterances: []semantic_router.Utterance{
 		{Utterance: "how's the weather today?"},
 		{Utterance: "how are things going?"},
 		{Utterance: "lovely weather today"},

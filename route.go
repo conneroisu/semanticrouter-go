@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/conneroisu/go-semantic-router/domain"
+	"golang.org/x/sync/errgroup"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -23,8 +23,8 @@ type Router struct {
 //
 // It is a struct that contains a name and a slice of Utterances.
 type Route struct {
-	Name       string             `json:"name"       yaml:"name"       toml:"name"`       // Name is the name of the route.
-	Utterances []domain.Utterance `json:"utterances" yaml:"utterances" toml:"utterances"` // Utterances is a slice of Utterances.
+	Name       string      `json:"name"       yaml:"name"       toml:"name"`       // Name is the name of the route.
+	Utterances []Utterance `json:"utterances" yaml:"utterances" toml:"utterances"` // Utterances is a slice of Utterances.
 }
 
 // Encoder represents a encoding driver in the semantic router.
@@ -39,7 +39,7 @@ type Encoder interface {
 // and stores it in a some sort of data store, and a method, Get, which takes a
 // string and returns a []float64 from the data store.
 type Store interface {
-	Store(ctx context.Context, utterance domain.Utterance) error
+	Store(ctx context.Context, utterance Utterance) error
 	Get(ctx context.Context, utterance string) ([]float64, error)
 }
 
@@ -86,31 +86,45 @@ func (r *Router) Match(
 	ctx context.Context,
 	utterance string,
 ) (bestRouteName string, bestScore float64, err error) {
-	encoding, err := r.Encoder.Encode(utterance)
-	if err != nil {
-		return "", 0.0, fmt.Errorf("error encoding utterance: %w", err)
-	}
-	queryVec := mat.NewVecDense(len(encoding), encoding)
-	for _, route := range r.Routes {
-		for _, ut := range route.Utterances {
-			em, err := r.Storage.Get(ctx, ut.Utterance)
-			if err != nil {
-				return "", 0.0, fmt.Errorf("error getting embedding: %w", err)
-			}
-			emLen := len(em)
-			if emLen != queryVec.Len() {
-				continue
-			}
-			indexVec := mat.NewVecDense(emLen, em)
-			simScore := SimilarityMatrix(queryVec, indexVec)
-			if simScore > bestScore {
-				bestScore = simScore
-				bestRouteName = route.Name
+	eg, ctx := errgroup.WithContext(ctx)
+	eg.Go(func() error {
+		encoding, err := r.Encoder.Encode(utterance)
+		if err != nil {
+			return ErrEncoding{
+				Message: fmt.Sprintf("error encoding utterance: %s", utterance),
 			}
 		}
-	}
-	if bestRouteName == "" {
-		return "", 0.0, fmt.Errorf("no route found")
+		queryVec := mat.NewVecDense(len(encoding), encoding)
+		for _, route := range r.Routes {
+			for _, ut := range route.Utterances {
+				em, err := r.Storage.Get(ctx, ut.Utterance)
+				if err != nil {
+					return ErrGetEmbedding{
+						Message: fmt.Sprintf("error getting embedding: %s", ut.Utterance),
+					}
+				}
+				emLen := len(em)
+				if emLen != queryVec.Len() {
+					continue
+				}
+				indexVec := mat.NewVecDense(emLen, em)
+				simScore := SimilarityDotMatrix(queryVec, indexVec)
+				if simScore > bestScore {
+					bestScore = simScore
+					bestRouteName = route.Name
+				}
+			}
+		}
+		if bestRouteName == "" {
+			return ErrNoRouteFound{
+				Message:   "no route found",
+				Utterance: utterance,
+			}
+		}
+		return nil
+	})
+	if err := eg.Wait(); err != nil {
+		return "", 0.0, fmt.Errorf("no route found: %w", err)
 	}
 	return bestRouteName, bestScore, nil
 }

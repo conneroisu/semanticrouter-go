@@ -26,7 +26,9 @@ func TestStore(t *testing.T) {
 		testcontainers.GenericContainerRequest{
 			ContainerRequest: req,
 			Started:          true,
-		})
+			ProviderType:     testcontainers.ProviderPodman,
+		},
+	)
 	assert.NoError(t, err)
 	endpoint, err := redisContainer.Endpoint(ctx, "")
 	assert.NoError(t, err)

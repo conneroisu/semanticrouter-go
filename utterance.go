@@ -1,4 +1,4 @@
-package domain
+package semanticrouter
 
 import (
 	"encoding/json"
@@ -28,19 +28,6 @@ type UtterancePrime struct {
 	Embedding []float64 `json:"embedding"` // Embedding is the embedding of the utterance.
 }
 
-// Embedding returns the embedding of the utterance.
-func (u *Utterance) Embedding() (Embedding, error) {
-	type E struct {
-		Embedding []float64 `json:"embedding"`
-	}
-	var embedding E
-	err := json.Unmarshal(u.EmbeddingBytes, &embedding)
-	if err != nil {
-		return nil, fmt.Errorf("error unmarshaling embedding: %w", err)
-	}
-	return embedding.Embedding, nil
-}
-
 // SetEmbedding sets the embedding of the utterance.
 func (u *Utterance) SetEmbedding(embedding []float64) error {
 	type E struct {
@@ -53,4 +40,17 @@ func (u *Utterance) SetEmbedding(embedding []float64) error {
 	}
 	u.EmbeddingBytes = embeddingBytes
 	return nil
+}
+
+// Embedding returns the embedding of the utterance.
+func (u *Utterance) Embedding() (Embedding, error) {
+	type E struct {
+		Embedding []float64 `json:"embedding"`
+	}
+	var embedding E
+	err := json.Unmarshal(u.EmbeddingBytes, &embedding)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling embedding: %w", err)
+	}
+	return embedding.Embedding, nil
 }

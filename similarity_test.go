@@ -81,7 +81,7 @@ func TestSimilarityMatrix(t *testing.T) {
 			t.Parallel()
 			query := createVecDense(tc.queryVec)
 			index := createVecDense(tc.indexVec)
-			similarity := SimilarityMatrix(query, index)
+			similarity := SimilarityDotMatrix(query, index)
 
 			expected := []float64{tc.expectedSim}
 			actual := []float64{similarity}
