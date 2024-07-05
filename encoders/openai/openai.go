@@ -2,7 +2,7 @@ package encoders
 
 import (
 	"context"
-	"log"
+	"fmt"
 
 	openai "github.com/sashabaranov/go-openai"
 )
@@ -26,7 +26,7 @@ func (o OpenAIEncoder) Encode(utterance string) ([]float64, error) {
 		queryReq,
 	)
 	if err != nil {
-		log.Fatal("Error creating query embedding:", err)
+		return nil, fmt.Errorf("error creating query embedding: %w", err)
 	}
 	var floats []float32
 	for _, f := range queryResponse.Data[0].Embedding {

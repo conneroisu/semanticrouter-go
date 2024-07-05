@@ -18,18 +18,17 @@ func TestEncoder_Encode(t *testing.T) {
 	if err != nil {
 		log.Fatalf("failed to start container: %s", err)
 	}
-
 	// Clean up the container
 	defer func() {
 		if err := ollamaContainer.Terminate(ctx); err != nil {
-			log.Fatalf("failed to terminate container: %s", err) // nolint:gocritic
+			t.Fatalf("failed to terminate container: %s", err) // nolint:gocritic
 		}
 	}()
 	cli, err := api.ClientFromEnvironment()
 	assert.NoError(t, err)
 	encoder := Encoder{
 		Client: cli,
-		Model:  "all-minilma",
+		Model:  "mxbai-embed-large",
 	}
 	result, err := encoder.Encode("hello world")
 	assert.NoError(t, err)
