@@ -30,7 +30,6 @@ func TestStore(t *testing.T) {
 	assert.NoError(t, err)
 	store := Store{
 		Client: client,
-		Bucket: "testbucket",
 	}
 	err = store.Store(
 		ctx,

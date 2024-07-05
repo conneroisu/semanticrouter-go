@@ -5,7 +5,7 @@ package ollama
 
 import (
 	"context"
-	"fmt"
+	"log"
 
 	"github.com/ollama/ollama/api"
 )
@@ -14,7 +14,6 @@ import (
 type Encoder struct {
 	Client *api.Client
 	Model  string
-	TopK   int
 }
 
 // NewEncoder creates a new Encoder.
@@ -27,14 +26,11 @@ func (e *Encoder) Encode(query string) (result []float64, err error) {
 	req := &api.EmbeddingRequest{
 		Model:  e.Model,
 		Prompt: query,
-		Options: map[string]interface{}{
-			"top_k": e.TopK,
-		},
 	}
 	ctx := context.Background()
 	em, err := e.Client.Embeddings(ctx, req)
 	if err != nil {
-		return nil, fmt.Errorf("error creating query embedding: %w", err)
+		log.Fatal(err)
 	}
 	result = em.Embedding
 	return result, nil
