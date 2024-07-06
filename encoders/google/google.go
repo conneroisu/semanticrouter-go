@@ -19,13 +19,16 @@ func NewGoogleEncoder(
 	ctx context.Context,
 	client genai.Client,
 ) *GoogleEncoder {
-	return &GoogleEncoder{client: client}
+	return &GoogleEncoder{
+		Ctx:    ctx,
+		client: client,
+	}
 }
 
 // Encode encodes a query string into a Google search URL.
 func (e *GoogleEncoder) Encode(query string) ([]float64, error) {
 	model := e.client.EmbeddingModel(e.name)
-	embedding, err := model.EmbedContent(e.Ctx)
+	embedding, err := model.EmbedContent(e.Ctx, genai.Text(query))
 	if err != nil {
 		return nil, err
 	}
