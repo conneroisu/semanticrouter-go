@@ -14,7 +14,7 @@ jobs:
     - name: Install ollama
       run: |
         curl -fsSL https://ollama.com/install.sh | sudo -E sh
-        ollama serve & || true
+        ollama serve & 
         ollama pull all-minilm
 
     - name: Set Up Go
