@@ -17,8 +17,8 @@ type Encoder struct {
 }
 
 // NewEncoder creates a new Encoder.
-func NewEncoder(client *api.Client) *Encoder {
-	return &Encoder{Client: client}
+func NewEncoder(client *api.Client, model string) *Encoder {
+	return &Encoder{Client: client, Model: model}
 }
 
 // Encode encodes a query string into a Ollama embedding.

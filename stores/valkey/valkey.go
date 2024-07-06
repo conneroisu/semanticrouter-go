@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 
-	semanticrouter "github.com/conneroisu/go-semantic-router"
+	"github.com/conneroisu/go-semantic-router/domain"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -36,7 +36,7 @@ func (s *Store) Get(
 		}
 		return nil, err
 	}
-	var utPr semanticrouter.UtterancePrime
+	var utPr domain.UtterancePrime
 	err = json.Unmarshal(bytes.NewBufferString(val).Bytes(), &utPr)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshaling embedding: %w", err)
@@ -50,7 +50,7 @@ func (s *Store) Set(
 	utterance string,
 	value []float64,
 ) (string, error) {
-	val, err := json.Marshal(semanticrouter.UtterancePrime{Embedding: value})
+	val, err := json.Marshal(domain.UtterancePrime{Embedding: value})
 	if err != nil {
 		return "", fmt.Errorf("error marshaling embedding: %w", err)
 	}

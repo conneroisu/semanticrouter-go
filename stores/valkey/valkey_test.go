@@ -2,7 +2,6 @@ package valkey
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	clientLib "github.com/redis/go-redis/v9"
@@ -40,12 +39,11 @@ func TestStore(t *testing.T) {
 			}),
 	}
 
-	val, err := store.Set(
+	_, err = store.Set(
 		ctx,
 		"key",
 		[]float64{1.0, 2.0, 3.0, 4.0, 5.0},
 	)
-	t.Log(fmt.Sprintf("val: %v", val))
 	assert.NoError(t, err)
 
 	floats, err := store.Get(ctx, "key")

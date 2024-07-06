@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/conneroisu/go-semantic-router/domain"
 	"golang.org/x/sync/errgroup"
 	"gonum.org/v1/gonum/mat"
 )
@@ -14,7 +15,7 @@ import (
 //
 // Match can be called on a Router to find the best route for a given utterance.
 type Router struct {
-	Routes  []Route `json:"routes" yaml:"routes" toml:"routes"`    // Routes is a slice of Routes.
+	Routes  []Route `json:"routes"  yaml:"routes"  toml:"routes"`  // Routes is a slice of Routes.
 	Encoder Encoder `json:"encoder" yaml:"encoder" toml:"encoder"` // Encoder is an Encoder that encodes utterances into vectors.
 	Storage Store   `json:"storage" yaml:"storage" toml:"storage"` // Storage is a Store that stores the utterances.
 }
@@ -23,8 +24,8 @@ type Router struct {
 //
 // It is a struct that contains a name and a slice of Utterances.
 type Route struct {
-	Name       string      `json:"name"       yaml:"name"       toml:"name"`       // Name is the name of the route.
-	Utterances []Utterance `json:"utterances" yaml:"utterances" toml:"utterances"` // Utterances is a slice of Utterances.
+	Name       string             `json:"name"       yaml:"name"       toml:"name"`       // Name is the name of the route.
+	Utterances []domain.Utterance `json:"utterances" yaml:"utterances" toml:"utterances"` // Utterances is a slice of Utterances.
 }
 
 // Encoder represents a encoding driver in the semantic router.
@@ -39,12 +40,16 @@ type Encoder interface {
 // and stores it in a some sort of data store, and a method, Get, which takes a
 // string and returns a []float64 from the data store.
 type Store interface {
-	Store(ctx context.Context, utterance Utterance) error
-	Get(ctx context.Context, utterance string) ([]float64, error)
+	Store(ctx context.Context, keyValPair domain.Utterance) error
+	Get(ctx context.Context, key string) ([]float64, error)
 }
 
 // NewRouter creates a new semantic router.
-func NewRouter(routes []Route, encoder Encoder, store Store) (router *Router, err error) {
+func NewRouter(
+	routes []Route,
+	encoder Encoder,
+	store Store,
+) (router *Router, err error) {
 	routesLen := len(routes)
 	ctx := context.Background()
 	for i := 0; i < routesLen; i++ {
@@ -91,7 +96,10 @@ func (r *Router) Match(
 		encoding, err := r.Encoder.Encode(utterance)
 		if err != nil {
 			return ErrEncoding{
-				Message: fmt.Sprintf("error encoding utterance: %s", utterance),
+				Message: fmt.Sprintf(
+					"error encoding utterance: %s",
+					utterance,
+				),
 			}
 		}
 		queryVec := mat.NewVecDense(len(encoding), encoding)
@@ -100,7 +108,10 @@ func (r *Router) Match(
 				em, err := r.Storage.Get(ctx, ut.Utterance)
 				if err != nil {
 					return ErrGetEmbedding{
-						Message: fmt.Sprintf("error getting embedding: %s", ut.Utterance),
+						Message: fmt.Sprintf(
+							"error getting embedding: %s",
+							ut.Utterance,
+						),
 					}
 				}
 				emLen := len(em)

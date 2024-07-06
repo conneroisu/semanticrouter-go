@@ -1,4 +1,4 @@
-package semanticrouter
+package domain
 
 import (
 	"encoding/json"
@@ -12,13 +12,13 @@ type Embedding []float64
 
 // Utterance represents a utterance in the semantic router.
 type Utterance struct {
-	*bun.BaseModel `bun:"table:utterances"`
+	*bun.BaseModel `          bun:"table:utterances"`
 	// ID is the ID of the utterance.
 	ID int `bun:"id,pk,autoincrement"`
 	// Utterance is the utterance.
 	Utterance string `bun:"utterance"`
 	// EmbeddingBytes is the embedding of the utterance.
-	EmbeddingBytes []byte `bun:"embedding" json:"embedding"`
+	EmbeddingBytes []byte `bun:"embedding"           json:"embedding"`
 	// Embed is the Embed of the utterance.
 	Embed Embedding
 }

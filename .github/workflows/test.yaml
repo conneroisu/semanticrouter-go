@@ -11,6 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    - name: Install ollama
+      run: |
+        curl -fsSL https://ollama.com/install.sh | sh
+        ollama pull all-minilm
 
     - name: Set Up Go
       uses: actions/setup-go@v5
