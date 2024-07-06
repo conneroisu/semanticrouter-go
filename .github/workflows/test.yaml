@@ -14,7 +14,7 @@ jobs:
     - name: Install ollama
       run: |
         curl -fsSL https://ollama.com/install.sh | sh
-        ollama pull all-minilm
+        sh ollama pull all-minilm
 
     - name: Set Up Go
       uses: actions/setup-go@v5
