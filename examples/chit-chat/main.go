@@ -11,6 +11,7 @@ import (
 	"github.com/conneroisu/go-semantic-router/domain"
 	encoders "github.com/conneroisu/go-semantic-router/encoders/openai"
 	"github.com/conneroisu/go-semantic-router/stores/memory"
+	"github.com/sashabaranov/go-openai"
 )
 
 // PoliticsRoutes represents a set of routes that are noteworthy.
@@ -49,15 +50,14 @@ func main() {
 func run() error {
 	ctx := context.Background()
 	store := memory.NewStore()
-
+	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
 	router, err := semantic_router.NewRouter(
 		[]semantic_router.Route{
 			PoliticsRoutes,
 			ChitchatRoutes,
 		},
 		encoders.OpenAIEncoder{
-			APIKey: os.Getenv("OPENAI_API_KEY"),
-			Model:  "text-embedding-3-small",
+			Client: client,
 		},
 		store,
 	)

@@ -1,8 +1,9 @@
 module github.com/conneroisu/go-semantic-router
 
-go 1.22.0
+go 1.22.4
 
 require (
+	github.com/conneroisu/go-voyageai v0.0.0-20240706192950-8a7d71c716cf
 	github.com/google/generative-ai-go v0.14.0
 	github.com/ollama/ollama v0.1.48
 	github.com/redis/go-redis/v9 v9.5.3
@@ -50,7 +51,6 @@ require (
 	github.com/googleapis/gax-go/v2 v2.12.4 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/klauspost/compress v1.17.6 // indirect
-	github.com/kr/pretty v0.3.1 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect

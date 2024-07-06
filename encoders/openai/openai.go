@@ -10,18 +10,16 @@ import (
 // OpenAIEncoder encodes a query string into an OpenAI embedding.
 type OpenAIEncoder struct {
 	Ctx    context.Context
-	APIKey string
-	Model  openai.EmbeddingModel
+	Client *openai.Client
 }
 
 // Encode encodes the given utterance using the OpenAI API.
 func (o OpenAIEncoder) Encode(utterance string) ([]float64, error) {
-	client := openai.NewClient(o.APIKey)
 	queryReq := openai.EmbeddingRequest{
 		Input: utterance,
 		Model: openai.AdaEmbeddingV2,
 	}
-	queryResponse, err := client.CreateEmbeddings(
+	queryResponse, err := o.Client.CreateEmbeddings(
 		context.Background(),
 		queryReq,
 	)
