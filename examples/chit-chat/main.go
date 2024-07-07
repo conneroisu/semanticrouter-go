@@ -56,7 +56,7 @@ func run() error {
 			PoliticsRoutes,
 			ChitchatRoutes,
 		},
-		encoders.OpenAIEncoder{
+		encoders.Encoder{
 			Client: client,
 		},
 		store,

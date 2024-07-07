@@ -1,6 +1,7 @@
 package voyageai
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/conneroisu/go-voyageai"
@@ -18,13 +19,18 @@ func NewEncoder(client *voyageai.Client, model string) *Encoder {
 }
 
 // Encode encodes a query string into a VoyageAI embedding.
-func (e *Encoder) Encode(query string) (result []float64, err error) {
-	resp, err := e.Client.Embeddings(voyageai.EmbeddingsRequest{
-		Model: e.Model,
-		Input: []string{query},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("error creating query embedding: %w", err)
+func (e *Encoder) Encode(ctx context.Context, query string) (result []float64, err error) {
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	default:
+		resp, err := e.Client.Embeddings(voyageai.EmbeddingsRequest{
+			Model: e.Model,
+			Input: []string{query},
+		})
+		if err != nil {
+			return nil, fmt.Errorf("error creating query embedding: %w", err)
+		}
+		return resp.Data[0].Embedding, nil
 	}
-	return resp.Data[0].Embedding, nil
 }

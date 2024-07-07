@@ -1,2 +1,2 @@
-// Package encoders provides encoders for OpenAI language models.
-package encoders
+// Package openai provides encoders for OpenAI embedding models.
+package openai

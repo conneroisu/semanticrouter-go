@@ -1,6 +1,3 @@
-// Package ollama provides an encoder using Ollama models.
-//
-// Ollama is the easiest way to get started with LLMs.
 package ollama
 
 import (
@@ -22,16 +19,20 @@ func NewEncoder(client *api.Client, model string) *Encoder {
 }
 
 // Encode encodes a query string into a Ollama embedding.
-func (e *Encoder) Encode(query string) (result []float64, err error) {
-	req := &api.EmbeddingRequest{
-		Model:  e.Model,
-		Prompt: query,
+func (e *Encoder) Encode(ctx context.Context, query string) (result []float64, err error) {
+	select {
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	default:
+		req := &api.EmbeddingRequest{
+			Model:  e.Model,
+			Prompt: query,
+		}
+		em, err := e.Client.Embeddings(ctx, req)
+		if err != nil {
+			log.Fatal(err)
+		}
+		result = em.Embedding
+		return result, nil
 	}
-	ctx := context.Background()
-	em, err := e.Client.Embeddings(ctx, req)
-	if err != nil {
-		log.Fatal(err)
-	}
-	result = em.Embedding
-	return result, nil
 }

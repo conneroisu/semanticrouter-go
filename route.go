@@ -33,7 +33,7 @@ type Route struct {
 // It is an interface that defines a single method, Encode, which takes a string
 // and returns a []float64 representing the embedding of the string.
 type Encoder interface {
-	Encode(string) ([]float64, error)
+	Encode(ctx context.Context, utterance string) ([]float64, error)
 }
 
 // Store is an interface that defines a method, Store, which takes a []float64
@@ -56,7 +56,7 @@ func NewRouter(
 		route := routes[i]
 		utters := route.Utterances
 		for _, utter := range utters {
-			en, err := encoder.Encode(utter.Utterance)
+			en, err := encoder.Encode(ctx, utter.Utterance)
 			if err != nil {
 				return nil, fmt.Errorf("error encoding utterance: %w", err)
 			}
@@ -93,7 +93,7 @@ func (r *Router) Match(
 ) (bestRouteName string, bestScore float64, err error) {
 	eg, ctx := errgroup.WithContext(ctx)
 	eg.Go(func() error {
-		encoding, err := r.Encoder.Encode(utterance)
+		encoding, err := r.Encoder.Encode(ctx, utterance)
 		if err != nil {
 			return ErrEncoding{
 				Message: fmt.Sprintf(
