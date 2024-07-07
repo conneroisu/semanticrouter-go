@@ -10,7 +10,7 @@
 
 Go Semantic Router is a superfast decision-making layer for your LLMs and agents written in pure [ Go ](https://go.dev/).
 
-Rather than waiting for slow LLM generations to make tool-use decisions, use the magic of semantic vector space to make those decisions — routing requests using semantic meaning.
+Rather than waiting for slow LLM generations to make tool-use decisions, use the magic of semantic vector space to make those decisions — routing requests using configurable semantic meaning.
 
 A pure-go package for abstractly computing similarity scores between a query vector embedding and a set of vector embeddings.
 
