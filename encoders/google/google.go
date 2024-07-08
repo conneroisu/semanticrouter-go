@@ -14,7 +14,6 @@ type GoogleEncoder struct {
 
 // NewGoogleEncoder creates a new GoogleEncoder.
 func NewGoogleEncoder(
-	ctx context.Context,
 	client genai.Client,
 ) *GoogleEncoder {
 	return &GoogleEncoder{
