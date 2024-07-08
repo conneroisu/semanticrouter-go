@@ -44,32 +44,43 @@ import "github.com/conneroisu/go-semantic-router/encoders/ollama"
 ### Conversational Agents Example
 
 ```go
+// Package main shows how to use the semantic router to find the best route for a given utterance
+// in the context of a chat bot or other conversational application.
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
 	semantic_router "github.com/conneroisu/go-semantic-router"
+	"github.com/conneroisu/go-semantic-router/domain"
+	encoders "github.com/conneroisu/go-semantic-router/encoders/openai"
 	"github.com/conneroisu/go-semantic-router/stores/memory"
-	"github.com/conneroisu/go-semantic-router/encoders"
+	"github.com/sashabaranov/go-openai"
 )
 
-// NoteworthyRoutes represents a set of routes that are noteworthy.
-// noteworthy here means that the routes are likely to be relevant to a noteworthy conversation in a veterinarian appointment.
-var NoteworthyRoutes = semantic_router.Route{
-	Name: "noteworthy",
-	Utterances: []semantic_router.Utterance{
-		{Utterance: "what is the best way to treat a dog with a cold?"},
-		{Utterance: "my cat has been limping, what should I do?"},
+// PoliticsRoutes represents a set of routes that are noteworthy.
+var PoliticsRoutes = semantic_router.Route{
+	Name: "politics",
+	Utterances: []domain.Utterance{
+		{Utterance: "isn't politics the best thing ever"},
+		{Utterance: "why don't you tell me about your political opinions"},
+		{Utterance: "don't you just love the president"},
+		{Utterance: "they're going to destroy this country!"},
+		{Utterance: "they will save the country!"},
 	},
 }
 
+// ChitchatRoutes represents a set of routes that are noteworthy.
 var ChitchatRoutes = semantic_router.Route{
 	Name: "chitchat",
-	Utterances: []semantic_router.Utterance{
-		{Utterance: "what is your favorite color?"},
-		{Utterance: "what is your favorite animal?"},
+	Utterances: []domain.Utterance{
+		{Utterance: "how's the weather today?"},
+		{Utterance: "how are things going?"},
+		{Utterance: "lovely weather today"},
+		{Utterance: "the weather is horrendous"},
+		{Utterance: "let's go to the chippy"},
 	},
 }
 
@@ -83,21 +94,30 @@ func main() {
 
 // run runs the example.
 func run() error {
+	ctx := context.Background()
 	store := memory.NewStore()
+	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
 	router, err := semantic_router.NewRouter(
-		[]semantic_router.Route{NoteworthyRoutes, ChitchatRoutes},
-		encoders.OpenAIEncoder{
-			APIKey: os.Getenv("OPENAI_API_KEY"),
-			Model:  "text-embedding-3-small",
+		[]semantic_router.Route{
+			PoliticsRoutes,
+			ChitchatRoutes,
+		},
+		encoders.Encoder{
+			Client: client,
 		},
 		store,
 	)
-	finding, p, err := router.Match("how's the weather today?")
+	if err != nil {
+		return fmt.Errorf("error creating router: %w", err)
+	}
+
+	finding, p, err := router.Match(ctx, "how's the weather today?")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
-	fmt.Println("Found:", finding)
+
 	fmt.Println("p:", p)
+	fmt.Println("Found:", finding)
 	return nil
 }
 ```
@@ -127,6 +147,7 @@ import (
 	"os"
 
 	semantic_router "github.com/conneroisu/go-semantic-router"
+	"github.com/conneroisu/go-semantic-router/domain"
 	"github.com/conneroisu/go-semantic-router/encoders/ollama"
 	"github.com/conneroisu/go-semantic-router/stores/memory"
 	"github.com/ollama/ollama/api"
@@ -136,7 +157,7 @@ import (
 // noteworthy here means that the routes are likely to be relevant to a noteworthy conversation in a veterinarian appointment.
 var NoteworthyRoutes = semantic_router.Route{
 	Name: "noteworthy",
-	Utterances: []Utterance{
+	Utterances: []domain.Utterance{
 		{Utterance: "what is the best way to treat a dog with a cold?"},
 		{Utterance: "my cat has been limping, what should I do?"},
 	},
@@ -146,7 +167,7 @@ var NoteworthyRoutes = semantic_router.Route{
 // chitchat here means that the routes are likely to be relevant to a chitchat conversation in a veterinarian appointment.
 var ChitchatRoutes = semantic_router.Route{
 	Name: "chitchat",
-	Utterances: []semantic_router.Utterance{
+	Utterances: []domain.Utterance{
 		{Utterance: "what is your favorite color?"},
 		{Utterance: "what is your favorite animal?"},
 	},
@@ -165,7 +186,7 @@ func run() error {
 	ctx := context.Background()
 	cli, err := api.ClientFromEnvironment()
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating client: %w", err)
 	}
 	router, err := semantic_router.NewRouter(
 		[]semantic_router.Route{NoteworthyRoutes, ChitchatRoutes},
@@ -175,6 +196,9 @@ func run() error {
 		},
 		memory.NewStore(),
 	)
+	if err != nil {
+		return fmt.Errorf("error creating router: %w", err)
+	}
 	finding, p, err := router.Match(ctx, "how's the weather today?")
 	if err != nil {
 		fmt.Println("Error:", err)
