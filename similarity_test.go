@@ -2,6 +2,7 @@ package semanticrouter
 
 import (
 	"fmt"
+	"math"
 	"testing"
 
 	"gonum.org/v1/gonum/floats"
@@ -208,5 +209,150 @@ func TestSimilarityMatrix(t *testing.T) {
 				}
 			},
 		)
+	}
+}
+
+func TestSimilarityDotMatrix(t *testing.T) {
+	tests := []struct {
+		xq, index []float64
+		want      float64
+	}{
+		{[]float64{1, 2, 3}, []float64{4, 5, 6}, 0.9746318461970762},
+		{[]float64{0, 0, 0}, []float64{1, 1, 1}, 0},
+		{[]float64{1, 1, 1}, []float64{1, 1, 1}, 1},
+	}
+
+	for _, tt := range tests {
+		xq := mat.NewVecDense(len(tt.xq), tt.xq)
+		index := mat.NewVecDense(len(tt.index), tt.index)
+		got := SimilarityDotMatrix(xq, index)
+		if math.Abs(got-tt.want) > 1e-9 {
+			t.Errorf("SimilarityDotMatrix(%v, %v) = %v; want %v", tt.xq, tt.index, got, tt.want)
+		}
+	}
+}
+
+func TestEuclideanDistance(t *testing.T) {
+	tests := []struct {
+		xq, index []float64
+		want      float64
+	}{
+		{[]float64{1, 2, 3}, []float64{4, 5, 6}, 5.196152422706632},
+		{[]float64{0, 0, 0}, []float64{1, 1, 1}, 1.7320508075688772},
+		{[]float64{1, 1, 1}, []float64{1, 1, 1}, 0},
+	}
+
+	for _, tt := range tests {
+		xq := mat.NewVecDense(len(tt.xq), tt.xq)
+		index := mat.NewVecDense(len(tt.index), tt.index)
+		got := EuclideanDistance(xq, index)
+		if math.Abs(got-tt.want) > 1e-9 {
+			t.Errorf("EuclideanDistance(%v, %v) = %v; want %v", tt.xq, tt.index, got, tt.want)
+		}
+	}
+}
+
+func TestManhattanDistance(t *testing.T) {
+	tests := []struct {
+		xq, index []float64
+		want      float64
+	}{
+		{[]float64{1, 2, 3}, []float64{4, 5, 6}, 9},
+		{[]float64{0, 0, 0}, []float64{1, 1, 1}, 3},
+		{[]float64{1, 1, 1}, []float64{1, 1, 1}, 0},
+	}
+
+	for _, tt := range tests {
+		xq := mat.NewVecDense(len(tt.xq), tt.xq)
+		index := mat.NewVecDense(len(tt.index), tt.index)
+		got := ManhattanDistance(xq, index)
+		if math.Abs(got-tt.want) > 1e-9 {
+			t.Errorf("ManhattanDistance(%v, %v) = %v; want %v", tt.xq, tt.index, got, tt.want)
+		}
+	}
+}
+
+func TestJaccardSimilarity(t *testing.T) {
+	tests := []struct {
+		xq, index []float64
+		want      float64
+	}{
+		{[]float64{1, 2, 3}, []float64{4, 5, 6}, 0.3333333333333333},
+		{[]float64{0, 0, 0}, []float64{1, 1, 1}, 0},
+		{[]float64{1, 1, 1}, []float64{1, 1, 1}, 1},
+	}
+
+	for _, tt := range tests {
+		xq := mat.NewVecDense(len(tt.xq), tt.xq)
+		index := mat.NewVecDense(len(tt.index), tt.index)
+		got := JaccardSimilarity(xq, index)
+		if math.Abs(got-tt.want) > 1e-9 {
+			t.Errorf("JaccardSimilarity(%v, %v) = %v; want %v", tt.xq, tt.index, got, tt.want)
+		}
+	}
+}
+
+func TestPearsonCorrelation(t *testing.T) {
+	tests := []struct {
+		xq, index []float64
+		want      float64
+	}{
+		{[]float64{1, 2, 3}, []float64{4, 5, 6}, 1},
+		{[]float64{0, 0, 0}, []float64{1, 1, 1}, 0},
+		{[]float64{1, 1, 1}, []float64{1, 1, 1}, math.NaN()},
+	}
+
+	for _, tt := range tests {
+		xq := mat.NewVecDense(len(tt.xq), tt.xq)
+		index := mat.NewVecDense(len(tt.index), tt.index)
+		got := PearsonCorrelation(xq, index)
+		if math.IsNaN(tt.want) {
+			if !math.IsNaN(got) {
+				t.Errorf("PearsonCorrelation(%v, %v) = %v; want %v", tt.xq, tt.index, got, tt.want)
+			}
+		} else if math.Abs(got-tt.want) > 1e-9 {
+			t.Errorf("PearsonCorrelation(%v, %v) = %v; want %v", tt.xq, tt.index, got, tt.want)
+		}
+	}
+}
+
+func TestHammingDistance(t *testing.T) {
+	tests := []struct {
+		xq, index []float64
+		want      float64
+	}{
+		{[]float64{1, 2, 3}, []float64{4, 5, 6}, 3},
+		{[]float64{0, 0, 0}, []float64{1, 1, 1}, 3},
+		{[]float64{1, 1, 1}, []float64{1, 1, 1}, 0},
+	}
+
+	for _, tt := range tests {
+		xq := mat.NewVecDense(len(tt.xq), tt.xq)
+		index := mat.NewVecDense(len(tt.index), tt.index)
+		got := HammingDistance(xq, index)
+		if math.Abs(got-tt.want) > 1e-9 {
+			t.Errorf("HammingDistance(%v, %v) = %v; want %v", tt.xq, tt.index, got, tt.want)
+		}
+	}
+}
+
+func TestMinkowskiDistance(t *testing.T) {
+	tests := []struct {
+		xq, index []float64
+		p         float64
+		want      float64
+	}{
+		{[]float64{1, 2, 3}, []float64{4, 5, 6}, 3, 3.3019272488946263},
+		{[]float64{0, 0, 0}, []float64{1, 1, 1}, 2, 1.7320508075688772},
+		{[]float64{1, 1, 1}, []float64{1, 1, 1}, 1, 0},
+	}
+
+	for _, tt := range tests {
+		xq := mat.NewVecDense(len(tt.xq), tt.xq)
+		index := mat.NewVecDense(len(tt.index), tt.index)
+		got := MinkowskiDistance(xq, index, tt.p)
+		if math.Abs(got-tt.want) > 1e-9 {
+			t.Errorf("MinkowskiDistance(%v, %v, %v) = %v; want %v", tt.xq, tt.index, tt.p, got, tt.want)
+		}
 	}
 }
