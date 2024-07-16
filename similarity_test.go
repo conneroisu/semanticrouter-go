@@ -277,7 +277,7 @@ func TestJaccardSimilarity(t *testing.T) {
 		xq, index []float64
 		want      float64
 	}{
-		{[]float64{1, 2, 3}, []float64{4, 5, 6}, 0.3333333333333333},
+		{[]float64{1, 2, 3}, []float64{4, 5, 6}, 0.4},
 		{[]float64{0, 0, 0}, []float64{1, 1, 1}, 0},
 		{[]float64{1, 1, 1}, []float64{1, 1, 1}, 1},
 	}
@@ -301,7 +301,6 @@ func TestPearsonCorrelation(t *testing.T) {
 		{[]float64{0, 0, 0}, []float64{1, 1, 1}, 0},
 		{[]float64{1, 1, 1}, []float64{1, 1, 1}, math.NaN()},
 	}
-
 	for _, tt := range tests {
 		xq := mat.NewVecDense(len(tt.xq), tt.xq)
 		index := mat.NewVecDense(len(tt.index), tt.index)
@@ -342,7 +341,7 @@ func TestMinkowskiDistance(t *testing.T) {
 		p         float64
 		want      float64
 	}{
-		{[]float64{1, 2, 3}, []float64{4, 5, 6}, 3, 3.3019272488946263},
+		{[]float64{1, 2, 3}, []float64{4, 5, 6}, 3, 4.326748710922225},
 		{[]float64{0, 0, 0}, []float64{1, 1, 1}, 2, 1.7320508075688772},
 		{[]float64{1, 1, 1}, []float64{1, 1, 1}, 1, 0},
 	}
