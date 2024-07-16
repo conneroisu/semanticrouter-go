@@ -51,9 +51,9 @@ func ManhattanDistance(xq, index *mat.VecDense) float64 {
 	return mat.Norm(diff, 1)
 }
 
-// JaccardSimilarity calculates the Jaccard distance between two vectors.
+// JaccardSimilarity calculates the Jaccard similarity between two vectors.
 //
-// The Jaccard distance is the size of the intersection of the two sets divided by the size of the union of the two sets.
+// The Jaccard similarity is the size of the intersection of the two sets divided by the size of the union of the two sets.
 //
 // The function takes two vectors as input and returns the Jaccard distance between them.
 func JaccardSimilarity(xq, index *mat.VecDense) float64 {
