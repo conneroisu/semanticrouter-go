@@ -19,7 +19,10 @@ func NewEncoder(client *voyageai.Client, model string) *Encoder {
 }
 
 // Encode encodes a query string into a VoyageAI embedding.
-func (e *Encoder) Encode(ctx context.Context, query string) (result []float64, err error) {
+func (e *Encoder) Encode(
+	ctx context.Context,
+	query string,
+) (result []float64, err error) {
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()

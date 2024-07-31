@@ -16,7 +16,10 @@ type Encoder struct {
 }
 
 // Encode encodes the given utterance using the OpenAI API.
-func (o Encoder) Encode(ctx context.Context, utterance string) ([]float64, error) {
+func (o Encoder) Encode(
+	ctx context.Context,
+	utterance string,
+) ([]float64, error) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -37,7 +40,10 @@ func (o Encoder) Encode(ctx context.Context, utterance string) ([]float64, error
 				queryReq,
 			)
 			if err != nil {
-				return nil, fmt.Errorf("error creating query embedding: %w", err)
+				return nil, fmt.Errorf(
+					"error creating query embedding: %w",
+					err,
+				)
 			}
 			var floats []float32
 			for _, f := range queryResponse.Data[0].Embedding {
