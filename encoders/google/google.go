@@ -22,7 +22,10 @@ func NewGoogleEncoder(
 }
 
 // Encode encodes a query string into a Google search URL.
-func (e *GoogleEncoder) Encode(ctx context.Context, query string) ([]float64, error) {
+func (e *GoogleEncoder) Encode(
+	ctx context.Context,
+	query string,
+) ([]float64, error) {
 	select {
 	case <-ctx.Done():
 		return nil, ctx.Err()

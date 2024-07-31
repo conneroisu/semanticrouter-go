@@ -227,7 +227,13 @@ func TestSimilarityDotMatrix(t *testing.T) {
 		index := mat.NewVecDense(len(tt.index), tt.index)
 		got := SimilarityDotMatrix(xq, index)
 		if math.Abs(got-tt.want) > 1e-9 {
-			t.Errorf("SimilarityDotMatrix(%v, %v) = %v; want %v", tt.xq, tt.index, got, tt.want)
+			t.Errorf(
+				"SimilarityDotMatrix(%v, %v) = %v; want %v",
+				tt.xq,
+				tt.index,
+				got,
+				tt.want,
+			)
 		}
 	}
 }
@@ -247,7 +253,13 @@ func TestEuclideanDistance(t *testing.T) {
 		index := mat.NewVecDense(len(tt.index), tt.index)
 		got := EuclideanDistance(xq, index)
 		if math.Abs(got-tt.want) > 1e-9 {
-			t.Errorf("EuclideanDistance(%v, %v) = %v; want %v", tt.xq, tt.index, got, tt.want)
+			t.Errorf(
+				"EuclideanDistance(%v, %v) = %v; want %v",
+				tt.xq,
+				tt.index,
+				got,
+				tt.want,
+			)
 		}
 	}
 }
@@ -267,7 +279,13 @@ func TestManhattanDistance(t *testing.T) {
 		index := mat.NewVecDense(len(tt.index), tt.index)
 		got := ManhattanDistance(xq, index)
 		if math.Abs(got-tt.want) > 1e-9 {
-			t.Errorf("ManhattanDistance(%v, %v) = %v; want %v", tt.xq, tt.index, got, tt.want)
+			t.Errorf(
+				"ManhattanDistance(%v, %v) = %v; want %v",
+				tt.xq,
+				tt.index,
+				got,
+				tt.want,
+			)
 		}
 	}
 }
@@ -287,7 +305,13 @@ func TestJaccardSimilarity(t *testing.T) {
 		index := mat.NewVecDense(len(tt.index), tt.index)
 		got := JaccardSimilarity(xq, index)
 		if math.Abs(got-tt.want) > 1e-9 {
-			t.Errorf("JaccardSimilarity(%v, %v) = %v; want %v", tt.xq, tt.index, got, tt.want)
+			t.Errorf(
+				"JaccardSimilarity(%v, %v) = %v; want %v",
+				tt.xq,
+				tt.index,
+				got,
+				tt.want,
+			)
 		}
 	}
 }
@@ -307,7 +331,13 @@ func TestPearsonCorrelation(t *testing.T) {
 		got := PearsonCorrelation(xq, index)
 		if math.IsNaN(tt.want) {
 			if !math.IsNaN(got) {
-				t.Errorf("PearsonCorrelation(%v, %v) = %v; want %v", tt.xq, tt.index, got, tt.want)
+				t.Errorf(
+					"PearsonCorrelation(%v, %v) = %v; want %v",
+					tt.xq,
+					tt.index,
+					got,
+					tt.want,
+				)
 			}
 		} else if math.Abs(got-tt.want) > 1e-9 {
 			t.Errorf("PearsonCorrelation(%v, %v) = %v; want %v", tt.xq, tt.index, got, tt.want)
@@ -330,7 +360,13 @@ func TestHammingDistance(t *testing.T) {
 		index := mat.NewVecDense(len(tt.index), tt.index)
 		got := HammingDistance(xq, index)
 		if math.Abs(got-tt.want) > 1e-9 {
-			t.Errorf("HammingDistance(%v, %v) = %v; want %v", tt.xq, tt.index, got, tt.want)
+			t.Errorf(
+				"HammingDistance(%v, %v) = %v; want %v",
+				tt.xq,
+				tt.index,
+				got,
+				tt.want,
+			)
 		}
 	}
 }
@@ -351,7 +387,14 @@ func TestMinkowskiDistance(t *testing.T) {
 		index := mat.NewVecDense(len(tt.index), tt.index)
 		got := MinkowskiDistance(xq, index, tt.p)
 		if math.Abs(got-tt.want) > 1e-9 {
-			t.Errorf("MinkowskiDistance(%v, %v, %v) = %v; want %v", tt.xq, tt.index, tt.p, got, tt.want)
+			t.Errorf(
+				"MinkowskiDistance(%v, %v, %v) = %v; want %v",
+				tt.xq,
+				tt.index,
+				tt.p,
+				got,
+				tt.want,
+			)
 		}
 	}
 }
