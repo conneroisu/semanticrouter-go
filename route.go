@@ -15,10 +15,10 @@ import (
 //
 // Match can be called on a Router to find the best route for a given utterance.
 type Router struct {
-	Routes             []Route             `json:"routes"  yaml:"routes"  toml:"routes"`                                   // Routes is a slice of Routes.
-	Encoder            Encoder             `json:"encoder" yaml:"encoder" toml:"encoder"`                                  // Encoder is an Encoder that encodes utterances into vectors.
-	Storage            Store               `json:"storage" yaml:"storage" toml:"storage"`                                  // Storage is a Store that stores the utterances.
-	biFuncCoefficients []biFuncCoefficient `json:"biFuncCoefficients" yaml:"biFuncCoefficients" toml:"biFuncCoefficients"` // biFuncCoefficients is a slice of biFuncCoefficients that represent the bi-function coefficients.
+	Routes             []Route             `json:"routes"  yaml:"routes"  toml:"routes"`  // Routes is a slice of Routes.
+	Encoder            Encoder             `json:"encoder" yaml:"encoder" toml:"encoder"` // Encoder is an Encoder that encodes utterances into vectors.
+	Storage            Store               `json:"storage" yaml:"storage" toml:"storage"` // Storage is a Store that stores the utterances.
+	biFuncCoefficients []biFuncCoefficient // biFuncCoefficients is a slice of biFuncCoefficients that represent the bi-function coefficients.
 }
 
 // Route represents a route in the semantic router.
@@ -113,10 +113,17 @@ func NewRouter(
 ) (router *Router, err error) {
 	routesLen := len(routes)
 	ctx := context.Background()
+	for _, opt := range opts {
+		opt(router)
+	}
 	for i := 0; i < routesLen; i++ {
 		route := routes[i]
 		utters := route.Utterances
 		for _, utter := range utters {
+			_, err = store.Get(ctx, utter.Utterance)
+			if err == nil {
+				continue
+			}
 			en, err := encoder.Encode(ctx, utter.Utterance)
 			if err != nil {
 				return nil, fmt.Errorf("error encoding utterance: %w", err)
