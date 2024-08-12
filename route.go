@@ -113,6 +113,15 @@ func NewRouter(
 ) (router *Router, err error) {
 	routesLen := len(routes)
 	ctx := context.Background()
+	if len(opts) == 0 {
+		opts = []Option{
+			WithSimilarityDotMatrix(1.0),
+			WithEuclideanDistance(1.0),
+			WithManhattanDistance(1.0),
+			WithJaccardSimilarity(1.0),
+			WithPearsonCorrelation(1.0),
+		}
+	}
 	for _, opt := range opts {
 		opt(router)
 	}
