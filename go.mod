@@ -1,6 +1,6 @@
 module github.com/conneroisu/go-semantic-router
 
-go 1.22.4
+go 1.22.5
 
 require (
 	github.com/conneroisu/go-voyageai v0.0.0-20240706192950-8a7d71c716cf
