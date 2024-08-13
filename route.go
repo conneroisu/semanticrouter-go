@@ -111,6 +111,7 @@ func NewRouter(
 	store Store,
 	opts ...Option,
 ) (router *Router, err error) {
+	router = &Router{}
 	routesLen := len(routes)
 	ctx := context.Background()
 	if len(opts) == 0 {
@@ -126,9 +127,7 @@ func NewRouter(
 		opt(router)
 	}
 	for i := 0; i < routesLen; i++ {
-		route := routes[i]
-		utters := route.Utterances
-		for _, utter := range utters {
+		for _, utter := range routes[i].Utterances {
 			_, err = store.Get(ctx, utter.Utterance)
 			if err == nil {
 				continue
