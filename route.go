@@ -15,9 +15,10 @@ import (
 //
 // Match can be called on a Router to find the best route for a given utterance.
 type Router struct {
-	Routes  []Route `json:"routes"  yaml:"routes"  toml:"routes"`  // Routes is a slice of Routes.
-	Encoder Encoder `json:"encoder" yaml:"encoder" toml:"encoder"` // Encoder is an Encoder that encodes utterances into vectors.
-	Storage Store   `json:"storage" yaml:"storage" toml:"storage"` // Storage is a Store that stores the utterances.
+	Routes             []Route             `json:"routes"  yaml:"routes"  toml:"routes"`  // Routes is a slice of Routes.
+	Encoder            Encoder             `json:"encoder" yaml:"encoder" toml:"encoder"` // Encoder is an Encoder that encodes utterances into vectors.
+	Storage            Store               `json:"storage" yaml:"storage" toml:"storage"` // Storage is a Store that stores the utterances.
+	biFuncCoefficients []biFuncCoefficient // biFuncCoefficients is a slice of biFuncCoefficients that represent the bi-function coefficients.
 }
 
 // Route represents a route in the semantic router.
@@ -44,18 +45,93 @@ type Store interface {
 	Get(ctx context.Context, key string) ([]float64, error)
 }
 
+// Option is a function that configures a Router.
+type Option func(*Router)
+
+// biFuncCoefficient is an struct that represents a function and it's coefficient.
+type biFuncCoefficient struct {
+	Func        func(queryVec *mat.VecDense, indexVec *mat.VecDense) float64
+	Coefficient float64
+}
+
+// WithSimilarityDotMatrix sets the similarity function to use with a coefficient.
+func WithSimilarityDotMatrix(coefficient float64) Option {
+	return func(r *Router) {
+		r.biFuncCoefficients = append(r.biFuncCoefficients, biFuncCoefficient{
+			Func:        SimilarityDotMatrix,
+			Coefficient: coefficient,
+		})
+	}
+}
+
+// WithEuclideanDistance sets the EuclideanDistance function with a coefficient.
+func WithEuclideanDistance(coefficient float64) Option {
+	return func(r *Router) {
+		r.biFuncCoefficients = append(r.biFuncCoefficients, biFuncCoefficient{
+			Func:        EuclideanDistance,
+			Coefficient: coefficient,
+		})
+	}
+}
+
+// WithManhattanDistance sets the ManhattanDistance function with a coefficient.
+func WithManhattanDistance(coefficient float64) Option {
+	return func(r *Router) {
+		r.biFuncCoefficients = append(r.biFuncCoefficients, biFuncCoefficient{
+			Func:        ManhattanDistance,
+			Coefficient: coefficient,
+		})
+	}
+}
+
+// WithJaccardSimilarity sets the JaccardSimilarity function with a coefficient.
+func WithJaccardSimilarity(coefficient float64) Option {
+	return func(r *Router) {
+		r.biFuncCoefficients = append(r.biFuncCoefficients, biFuncCoefficient{
+			Func:        JaccardSimilarity,
+			Coefficient: coefficient,
+		})
+	}
+}
+
+// WithPearsonCorrelation sets the PearsonCorrelation function with a coefficient.
+func WithPearsonCorrelation(coefficient float64) Option {
+	return func(r *Router) {
+		r.biFuncCoefficients = append(r.biFuncCoefficients, biFuncCoefficient{
+			Func:        PearsonCorrelation,
+			Coefficient: coefficient,
+		})
+	}
+}
+
 // NewRouter creates a new semantic router.
 func NewRouter(
 	routes []Route,
 	encoder Encoder,
 	store Store,
+	opts ...Option,
 ) (router *Router, err error) {
+	router = &Router{}
 	routesLen := len(routes)
 	ctx := context.Background()
+	if len(opts) == 0 {
+		opts = []Option{
+			WithSimilarityDotMatrix(1.0),
+			WithEuclideanDistance(1.0),
+			WithManhattanDistance(1.0),
+			WithJaccardSimilarity(1.0),
+			WithPearsonCorrelation(1.0),
+		}
+	}
+	for _, opt := range opts {
+		opt(router)
+	}
 	for i := 0; i < routesLen; i++ {
-		route := routes[i]
-		utters := route.Utterances
-		for _, utter := range utters {
+		for _, utter := range routes[i].Utterances {
+			_, err = store.Get(ctx, utter.Utterance)
+			if err == nil {
+				continue
+			}
 			en, err := encoder.Encode(ctx, utter.Utterance)
 			if err != nil {
 				return nil, fmt.Errorf("error encoding utterance: %w", err)
@@ -119,7 +195,7 @@ func (r *Router) Match(
 					continue
 				}
 				indexVec := mat.NewVecDense(emLen, em)
-				simScore := SimilarityDotMatrix(queryVec, indexVec)
+				simScore := r.computeScore(queryVec, indexVec)
 				if simScore > bestScore {
 					bestScore = simScore
 					bestRouteName = route.Name
@@ -138,4 +214,18 @@ func (r *Router) Match(
 		return "", 0.0, fmt.Errorf("no route found: %w", err)
 	}
 	return bestRouteName, bestScore, nil
+}
+
+// computeScore computes the score for a given utterance and route.
+//
+// It takes a query vector and an index vector as input and returns a score.
+//
+// Additionally, it leverages the router's biFuncCoefficients to apply different
+// weighting factors to functions to get the similarity score.
+func (r *Router) computeScore(queryVec *mat.VecDense, indexVec *mat.VecDense) float64 {
+	score := 0.0
+	for _, fn := range r.biFuncCoefficients {
+		score += fn.Coefficient * fn.Func(queryVec, indexVec)
+	}
+	return score
 }
