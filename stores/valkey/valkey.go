@@ -61,3 +61,8 @@ func (s *Store) Set(
 	}
 	return string(val), nil
 }
+
+// Close closes the redis connection.
+func (s *Store) Close() error {
+	return s.rds.Close()
+}

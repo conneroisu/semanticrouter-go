@@ -1,9 +1,10 @@
-package valkey
+package valkey_test
 
 import (
 	"context"
 	"testing"
 
+	"github.com/conneroisu/go-semantic-router/stores/valkey"
 	clientLib "github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
@@ -31,13 +32,12 @@ func TestStore(t *testing.T) {
 	assert.NoError(t, err)
 	endpoint, err := redisContainer.Endpoint(ctx, "")
 	assert.NoError(t, err)
-	store := Store{
-		rds: clientLib.NewClient(
-			&clientLib.Options{
-				Addr:    endpoint,
-				Network: "tcp",
-			}),
-	}
+	store := valkey.NewStore(clientLib.NewClient(
+		&clientLib.Options{
+			Addr:    endpoint,
+			Network: "tcp",
+		},
+	))
 
 	_, err = store.Set(
 		ctx,

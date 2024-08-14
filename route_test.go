@@ -41,7 +41,7 @@ func TestNewRouter(t *testing.T) {
 	rout, err := NewRouter(
 		[]Route{NoteworthyRoutes, ChitchatRoutes},
 		ollama.NewEncoder(client, "all-minilm"),
-		*stor,
+		stor,
 	)
 	a.NoError(err)
 	a.NotNil(rout)
