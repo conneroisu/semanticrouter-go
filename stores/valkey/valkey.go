@@ -11,7 +11,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-// Store is a simple key-value store for embeddings.
+// Store is a simple key-value store for embeddings stored in valkey.
 type Store struct {
 	rds *redis.Client
 }
@@ -21,7 +21,12 @@ func NewStore(rds *redis.Client) *Store {
 	return &Store{rds: rds}
 }
 
-// Get gets a value from the
+// Close closes the redis connection of the valkey store.
+func (s *Store) Close() error {
+	return s.rds.Close()
+}
+
+// Get gets a value from the valkey store.
 func (s *Store) Get(
 	ctx context.Context,
 	utterance string,
@@ -36,28 +41,32 @@ func (s *Store) Get(
 		}
 		return nil, err
 	}
-	var utPr domain.UtterancePrime
+	var utPr domain.Utterance
 	err = json.Unmarshal(bytes.NewBufferString(val).Bytes(), &utPr)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshaling embedding: %w", err)
 	}
-	return utPr.Embedding, nil
+	return utPr.Embed, nil
 }
 
-// Set sets a value in the store
-func (s *Store) Set(
+// Set sets a value in the valkey store.
+func (s *Store) Store(
 	ctx context.Context,
-	utterance string,
-	value []float64,
-) (string, error) {
-	val, err := json.Marshal(domain.UtterancePrime{Embedding: value})
+	utterance domain.Utterance,
+) error {
+	val, err := json.Marshal(utterance)
 	if err != nil {
-		return "", fmt.Errorf("error marshaling embedding: %w", err)
+		return fmt.Errorf("error marshaling embedding: %w", err)
 	}
-	cmd := s.rds.Set(ctx, utterance, string(val), 0)
+	cmd := s.rds.Set(
+		ctx,
+		utterance.Utterance,
+		string(val),
+		0,
+	)
 	err = cmd.Err()
 	if err != nil {
-		return "", err
+		return fmt.Errorf("error setting embedding: %w", err)
 	}
-	return string(val), nil
+	return nil
 }

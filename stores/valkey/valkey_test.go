@@ -1,13 +1,20 @@
-package valkey
+package valkey_test
 
 import (
 	"context"
 	"testing"
 
+	semanticrouter "github.com/conneroisu/go-semantic-router"
+	"github.com/conneroisu/go-semantic-router/domain"
+	"github.com/conneroisu/go-semantic-router/stores/valkey"
 	clientLib "github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
+)
+
+var (
+	_ semanticrouter.Store = (*valkey.Store)(nil)
 )
 
 // TestStore is a test for the redis/valkey store.
@@ -31,18 +38,19 @@ func TestStore(t *testing.T) {
 	assert.NoError(t, err)
 	endpoint, err := redisContainer.Endpoint(ctx, "")
 	assert.NoError(t, err)
-	store := Store{
-		rds: clientLib.NewClient(
-			&clientLib.Options{
-				Addr:    endpoint,
-				Network: "tcp",
-			}),
-	}
+	store := valkey.NewStore(clientLib.NewClient(
+		&clientLib.Options{
+			Addr:    endpoint,
+			Network: "tcp",
+		},
+	))
 
-	_, err = store.Set(
+	err = store.Store(
 		ctx,
-		"key",
-		[]float64{1.0, 2.0, 3.0, 4.0, 5.0},
+		domain.Utterance{
+			Utterance: "key",
+			Embed:     []float64{1.0, 2.0, 3.0, 4.0, 5.0},
+		},
 	)
 	assert.NoError(t, err)
 

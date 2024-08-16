@@ -15,93 +15,24 @@ import (
 //
 // Match can be called on a Router to find the best route for a given utterance.
 type Router struct {
-	Routes             []Route             `json:"routes"  yaml:"routes"  toml:"routes"`  // Routes is a slice of Routes.
-	Encoder            Encoder             `json:"encoder" yaml:"encoder" toml:"encoder"` // Encoder is an Encoder that encodes utterances into vectors.
-	Storage            Store               `json:"storage" yaml:"storage" toml:"storage"` // Storage is a Store that stores the utterances.
-	biFuncCoefficients []biFuncCoefficient // biFuncCoefficients is a slice of biFuncCoefficients that represent the bi-function coefficients.
+	Routes      []Route             // Routes is a slice of Routes.
+	Encoder     Encoder             // Encoder is an Encoder that encodes utterances into vectors.
+	Storage     Store               // Storage is a Store that stores the utterances.
+	biFuncCoeff []biFuncCoefficient // biFuncCoefficients is a slice of biFuncCoefficients that represent the bi-function coefficients.
 }
 
 // Route represents a route in the semantic router.
 //
 // It is a struct that contains a name and a slice of Utterances.
 type Route struct {
-	Name       string             `json:"name"       yaml:"name"       toml:"name"`       // Name is the name of the route.
-	Utterances []domain.Utterance `json:"utterances" yaml:"utterances" toml:"utterances"` // Utterances is a slice of Utterances.
+	Name       string             // Name is the name of the route.
+	Utterances []domain.Utterance // Utterances is a slice of Utterances.
 }
-
-// Encoder represents a encoding driver in the semantic router.
-//
-// It is an interface that defines a single method, Encode, which takes a string
-// and returns a []float64 representing the embedding of the string.
-type Encoder interface {
-	Encode(ctx context.Context, utterance string) ([]float64, error)
-}
-
-// Store is an interface that defines a method, Store, which takes a []float64
-// and stores it in a some sort of data store, and a method, Get, which takes a
-// string and returns a []float64 from the data store.
-type Store interface {
-	Store(ctx context.Context, keyValPair domain.Utterance) error
-	Get(ctx context.Context, key string) ([]float64, error)
-}
-
-// Option is a function that configures a Router.
-type Option func(*Router)
 
 // biFuncCoefficient is an struct that represents a function and it's coefficient.
 type biFuncCoefficient struct {
-	Func        func(queryVec *mat.VecDense, indexVec *mat.VecDense) float64
-	Coefficient float64
-}
-
-// WithSimilarityDotMatrix sets the similarity function to use with a coefficient.
-func WithSimilarityDotMatrix(coefficient float64) Option {
-	return func(r *Router) {
-		r.biFuncCoefficients = append(r.biFuncCoefficients, biFuncCoefficient{
-			Func:        SimilarityDotMatrix,
-			Coefficient: coefficient,
-		})
-	}
-}
-
-// WithEuclideanDistance sets the EuclideanDistance function with a coefficient.
-func WithEuclideanDistance(coefficient float64) Option {
-	return func(r *Router) {
-		r.biFuncCoefficients = append(r.biFuncCoefficients, biFuncCoefficient{
-			Func:        EuclideanDistance,
-			Coefficient: coefficient,
-		})
-	}
-}
-
-// WithManhattanDistance sets the ManhattanDistance function with a coefficient.
-func WithManhattanDistance(coefficient float64) Option {
-	return func(r *Router) {
-		r.biFuncCoefficients = append(r.biFuncCoefficients, biFuncCoefficient{
-			Func:        ManhattanDistance,
-			Coefficient: coefficient,
-		})
-	}
-}
-
-// WithJaccardSimilarity sets the JaccardSimilarity function with a coefficient.
-func WithJaccardSimilarity(coefficient float64) Option {
-	return func(r *Router) {
-		r.biFuncCoefficients = append(r.biFuncCoefficients, biFuncCoefficient{
-			Func:        JaccardSimilarity,
-			Coefficient: coefficient,
-		})
-	}
-}
-
-// WithPearsonCorrelation sets the PearsonCorrelation function with a coefficient.
-func WithPearsonCorrelation(coefficient float64) Option {
-	return func(r *Router) {
-		r.biFuncCoefficients = append(r.biFuncCoefficients, biFuncCoefficient{
-			Func:        PearsonCorrelation,
-			Coefficient: coefficient,
-		})
-	}
+	handler     handler
+	coefficient float64
 }
 
 // NewRouter creates a new semantic router.
@@ -195,7 +126,10 @@ func (r *Router) Match(
 					continue
 				}
 				indexVec := mat.NewVecDense(emLen, em)
-				simScore := r.computeScore(queryVec, indexVec)
+				simScore, err := r.computeScore(queryVec, indexVec)
+				if err != nil {
+					return err
+				}
 				if simScore > bestScore {
 					bestScore = simScore
 					bestRouteName = route.Name
@@ -222,10 +156,15 @@ func (r *Router) Match(
 //
 // Additionally, it leverages the router's biFuncCoefficients to apply different
 // weighting factors to functions to get the similarity score.
-func (r *Router) computeScore(queryVec *mat.VecDense, indexVec *mat.VecDense) float64 {
+func (r *Router) computeScore(queryVec *mat.VecDense, indexVec *mat.VecDense) (float64, error) {
 	score := 0.0
-	for _, fn := range r.biFuncCoefficients {
-		score += fn.Coefficient * fn.Func(queryVec, indexVec)
+	for _, fn := range r.biFuncCoeff {
+
+		interScore, err := fn.handler(queryVec, indexVec)
+		if err != nil {
+			return 0.0, err
+		}
+		score += fn.coefficient * interScore
 	}
-	return score
+	return score, nil
 }

@@ -1,18 +1,24 @@
-package memory
+package memory_test
 
 import (
 	"context"
 	"testing"
 
+	semanticrouter "github.com/conneroisu/go-semantic-router"
 	"github.com/conneroisu/go-semantic-router/domain"
+	"github.com/conneroisu/go-semantic-router/stores/memory"
 	"github.com/stretchr/testify/assert"
+)
+
+var (
+	_ semanticrouter.Store = (*memory.Store)(nil)
 )
 
 // TestStore tests the in memory store.
 func TestStore(t *testing.T) {
 	a := assert.New(t)
 	ctx := context.Background()
-	store := NewStore()
+	store := memory.NewStore()
 	utter := domain.Utterance{
 		Utterance: "key",
 	}

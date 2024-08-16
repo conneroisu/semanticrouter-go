@@ -18,7 +18,7 @@ func NewStore() *Store {
 }
 
 // Get gets a value from the
-func (s Store) Get(
+func (s *Store) Get(
 	_ context.Context,
 	utterance string,
 ) (embedding []float64, err error) {
@@ -30,7 +30,7 @@ func (s Store) Get(
 }
 
 // Store sets a value in the store
-func (s Store) Store(
+func (s *Store) Store(
 	_ context.Context,
 	utterance domain.Utterance,
 ) error {
@@ -39,5 +39,10 @@ func (s Store) Store(
 	if err != nil {
 		return fmt.Errorf("error getting embedding: %w", err)
 	}
+	return nil
+}
+
+// Close closes the store.
+func (s Store) Close() error {
 	return nil
 }

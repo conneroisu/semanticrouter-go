@@ -1,10 +1,12 @@
-package semanticrouter
+package semanticrouter_test
 
 import (
 	"fmt"
 	"math"
 	"testing"
 
+	semanticrouter "github.com/conneroisu/go-semantic-router"
+	"github.com/stretchr/testify/assert"
 	"gonum.org/v1/gonum/floats"
 	"gonum.org/v1/gonum/mat"
 )
@@ -189,11 +191,13 @@ func TestSimilarityMatrix(t *testing.T) {
 				tc.indexVec,
 			),
 			func(t *testing.T) {
+				a := assert.New(t)
 				tc := tc
 				t.Parallel()
 				query := createVecDense(tc.queryVec)
 				index := createVecDense(tc.indexVec)
-				similarity := SimilarityDotMatrix(query, index)
+				similarity, err := semanticrouter.SimilarityDotMatrix(query, index)
+				a.NoError(err)
 
 				expected := []float64{tc.expectedSim}
 				actual := []float64{similarity}
@@ -212,6 +216,7 @@ func TestSimilarityMatrix(t *testing.T) {
 	}
 }
 
+// TestSimilarityDotMatrix tests the SimilarityDotMatrix function
 func TestSimilarityDotMatrix(t *testing.T) {
 	tests := []struct {
 		xq, index []float64
@@ -223,9 +228,11 @@ func TestSimilarityDotMatrix(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		a := assert.New(t)
 		xq := mat.NewVecDense(len(tt.xq), tt.xq)
 		index := mat.NewVecDense(len(tt.index), tt.index)
-		got := SimilarityDotMatrix(xq, index)
+		got, err := semanticrouter.SimilarityDotMatrix(xq, index)
+		a.NoError(err)
 		if math.Abs(got-tt.want) > 1e-9 {
 			t.Errorf(
 				"SimilarityDotMatrix(%v, %v) = %v; want %v",
@@ -238,6 +245,7 @@ func TestSimilarityDotMatrix(t *testing.T) {
 	}
 }
 
+// TestEuclideanDistance tests the EuclideanDistance function
 func TestEuclideanDistance(t *testing.T) {
 	tests := []struct {
 		xq, index []float64
@@ -249,9 +257,11 @@ func TestEuclideanDistance(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		a := assert.New(t)
 		xq := mat.NewVecDense(len(tt.xq), tt.xq)
 		index := mat.NewVecDense(len(tt.index), tt.index)
-		got := EuclideanDistance(xq, index)
+		got, err := semanticrouter.EuclideanDistance(xq, index)
+		a.NoError(err)
 		if math.Abs(got-tt.want) > 1e-9 {
 			t.Errorf(
 				"EuclideanDistance(%v, %v) = %v; want %v",
@@ -264,6 +274,7 @@ func TestEuclideanDistance(t *testing.T) {
 	}
 }
 
+// TestManhattanDistance tests the ManhattanDistance function
 func TestManhattanDistance(t *testing.T) {
 	tests := []struct {
 		xq, index []float64
@@ -275,9 +286,11 @@ func TestManhattanDistance(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		a := assert.New(t)
 		xq := mat.NewVecDense(len(tt.xq), tt.xq)
 		index := mat.NewVecDense(len(tt.index), tt.index)
-		got := ManhattanDistance(xq, index)
+		got, err := semanticrouter.ManhattanDistance(xq, index)
+		a.NoError(err)
 		if math.Abs(got-tt.want) > 1e-9 {
 			t.Errorf(
 				"ManhattanDistance(%v, %v) = %v; want %v",
@@ -290,6 +303,7 @@ func TestManhattanDistance(t *testing.T) {
 	}
 }
 
+// TestJaccardSimilarity tests the JaccardSimilarity function
 func TestJaccardSimilarity(t *testing.T) {
 	tests := []struct {
 		xq, index []float64
@@ -301,9 +315,11 @@ func TestJaccardSimilarity(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		a := assert.New(t)
 		xq := mat.NewVecDense(len(tt.xq), tt.xq)
 		index := mat.NewVecDense(len(tt.index), tt.index)
-		got := JaccardSimilarity(xq, index)
+		got, err := semanticrouter.JaccardSimilarity(xq, index)
+		a.NoError(err)
 		if math.Abs(got-tt.want) > 1e-9 {
 			t.Errorf(
 				"JaccardSimilarity(%v, %v) = %v; want %v",
@@ -316,6 +332,7 @@ func TestJaccardSimilarity(t *testing.T) {
 	}
 }
 
+// TestPearsonCorrelation tests the PearsonCorrelation function
 func TestPearsonCorrelation(t *testing.T) {
 	tests := []struct {
 		xq, index []float64
@@ -326,9 +343,11 @@ func TestPearsonCorrelation(t *testing.T) {
 		{[]float64{1, 1, 1}, []float64{1, 1, 1}, math.NaN()},
 	}
 	for _, tt := range tests {
+		a := assert.New(t)
 		xq := mat.NewVecDense(len(tt.xq), tt.xq)
 		index := mat.NewVecDense(len(tt.index), tt.index)
-		got := PearsonCorrelation(xq, index)
+		got, err := semanticrouter.PearsonCorrelation(xq, index)
+		a.NoError(err)
 		if math.IsNaN(tt.want) {
 			if !math.IsNaN(got) {
 				t.Errorf(
@@ -345,6 +364,7 @@ func TestPearsonCorrelation(t *testing.T) {
 	}
 }
 
+// TestHammingDistance tests the HammingDistance function
 func TestHammingDistance(t *testing.T) {
 	tests := []struct {
 		xq, index []float64
@@ -356,9 +376,11 @@ func TestHammingDistance(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		a := assert.New(t)
 		xq := mat.NewVecDense(len(tt.xq), tt.xq)
 		index := mat.NewVecDense(len(tt.index), tt.index)
-		got := HammingDistance(xq, index)
+		got, err := semanticrouter.HammingDistance(xq, index)
+		a.NoError(err)
 		if math.Abs(got-tt.want) > 1e-9 {
 			t.Errorf(
 				"HammingDistance(%v, %v) = %v; want %v",
@@ -371,6 +393,7 @@ func TestHammingDistance(t *testing.T) {
 	}
 }
 
+// TestMinkowskiDistance tests the MinkowskiDistance function
 func TestMinkowskiDistance(t *testing.T) {
 	tests := []struct {
 		xq, index []float64
@@ -383,9 +406,11 @@ func TestMinkowskiDistance(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		a := assert.New(t)
 		xq := mat.NewVecDense(len(tt.xq), tt.xq)
 		index := mat.NewVecDense(len(tt.index), tt.index)
-		got := MinkowskiDistance(xq, index, tt.p)
+		got, err := semanticrouter.MinkowskiDistance(xq, index, tt.p)
+		a.NoError(err)
 		if math.Abs(got-tt.want) > 1e-9 {
 			t.Errorf(
 				"MinkowskiDistance(%v, %v, %v) = %v; want %v",
@@ -395,6 +420,54 @@ func TestMinkowskiDistance(t *testing.T) {
 				got,
 				tt.want,
 			)
+		}
+	}
+}
+
+// TestNormalizeScores tests the NormalizeScores function
+// to ensure that the scores are normalized correctly.
+// It does this testing by comparing the normalized scores
+// with the expected values.
+func TestNormalizeScores(t *testing.T) {
+	testCases := []struct {
+		input    []float64
+		expected []float64
+	}{
+		{
+			input:    []float64{1.0, 2.0, 3.0, 4.0, 5.0},
+			expected: []float64{0.0, 0.25, 0.5, 0.75, 1.0},
+		},
+		{
+			input:    []float64{5.0, 5.0, 5.0, 5.0},
+			expected: []float64{0.0, 0.0, 0.0, 0.0},
+		},
+		{
+			input: []float64{2.0, 8.0, 4.0, 6.0},
+			expected: []float64{
+				0.0,
+				1.0,
+				0.3333333333333333,
+				0.6666666666666666,
+			},
+		},
+		{
+			input:    []float64{0.0, 0.5, 1.0, 1.5, 2.0},
+			expected: []float64{0.0, 0.25, 0.5, 0.75, 1.0},
+		},
+		{input: []float64{-1.0, 0.0, 1.0}, expected: []float64{0.0, 0.5, 1.0}},
+	}
+	for _, tc := range testCases {
+		result := semanticrouter.NormalizeScores(tc.input)
+		for i, v := range result {
+			if v != tc.expected[i] {
+				t.Errorf(
+					"For input %v, expected %v but got %v",
+					tc.input,
+					tc.expected,
+					result,
+				)
+				break
+			}
 		}
 	}
 }

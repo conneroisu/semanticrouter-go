@@ -1,9 +1,10 @@
-package ollama
+package ollama_test
 
 import (
 	"context"
 	"testing"
 
+	"github.com/conneroisu/go-semantic-router/encoders/ollama"
 	"github.com/ollama/ollama/api"
 	"github.com/stretchr/testify/assert"
 )
@@ -15,7 +16,7 @@ func TestEncoder(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	encoder := NewEncoder(client, "all-minilm")
+	encoder := ollama.NewEncoder(client, "all-minilm")
 	result, err := encoder.Encode(ctx, "hello world")
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
