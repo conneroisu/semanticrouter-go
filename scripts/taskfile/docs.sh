@@ -3,4 +3,6 @@
 # 
 # Usage: make docs
 
-gomarkdoc --exclude-dirs ./testData/... ./... > docs/Home.md
+
+gum spin --spinner dot --title "Generating Docs" --show-output -- \
+	gomarkdoc --exclude-dirs ./testData/... ./... > ./Code-Generated.md

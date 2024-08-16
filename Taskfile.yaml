@@ -40,3 +40,7 @@ tasks:
   install:
     cmds:
       - sh ./scripts/taskfile/install.sh
+
+  docs:
+    cmds:
+      - sh ./scripts/taskfile/docs.sh

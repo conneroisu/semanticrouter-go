@@ -156,7 +156,10 @@ func (r *Router) Match(
 //
 // Additionally, it leverages the router's biFuncCoefficients to apply different
 // weighting factors to functions to get the similarity score.
-func (r *Router) computeScore(queryVec *mat.VecDense, indexVec *mat.VecDense) (float64, error) {
+func (r *Router) computeScore(
+	queryVec *mat.VecDense,
+	indexVec *mat.VecDense,
+) (float64, error) {
 	score := 0.0
 	for _, fn := range r.biFuncCoeff {
 
