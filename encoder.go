@@ -2,6 +2,7 @@ package semanticrouter
 
 import (
 	"context"
+	"io"
 
 	"github.com/conneroisu/go-semantic-router/domain"
 	"gonum.org/v1/gonum/mat"
@@ -19,66 +20,31 @@ type Encoder interface {
 // and stores it in a some sort of data store, and a method, Get, which takes a
 // string and returns a []float64 from the data store.
 type Store interface {
+	Storer
+	Getter
+	io.Closer
+}
+
+// Storer is an interface that defines a method, Store, which takes a []float64
+// and stores it in a some sort of data store.
+type Storer interface {
 	Store(ctx context.Context, keyValPair domain.Utterance) error
+}
+
+// Getter is an interface that defines a method, Get, which takes a
+// string and returns a []float64 from the data store.
+//
+// If the key does not exist, it returns an error.
+type Getter interface {
 	Get(ctx context.Context, key string) ([]float64, error)
-	Close() error
 }
 
 // Option is a function that configures a Router.
 type Option func(*Router)
 
-// biFuncCoefficient is an struct that represents a function and it's coefficient.
-type biFuncCoefficient struct {
-	Func        func(queryVec *mat.VecDense, indexVec *mat.VecDense) float64
-	Coefficient float64
-}
-
-// WithSimilarityDotMatrix sets the similarity function to use with a coefficient.
-func WithSimilarityDotMatrix(coefficient float64) Option {
-	return func(r *Router) {
-		r.biFuncCoefficients = append(r.biFuncCoefficients, biFuncCoefficient{
-			Func:        SimilarityDotMatrix,
-			Coefficient: coefficient,
-		})
-	}
-}
-
-// WithEuclideanDistance sets the EuclideanDistance function with a coefficient.
-func WithEuclideanDistance(coefficient float64) Option {
-	return func(r *Router) {
-		r.biFuncCoefficients = append(r.biFuncCoefficients, biFuncCoefficient{
-			Func:        EuclideanDistance,
-			Coefficient: coefficient,
-		})
-	}
-}
-
-// WithManhattanDistance sets the ManhattanDistance function with a coefficient.
-func WithManhattanDistance(coefficient float64) Option {
-	return func(r *Router) {
-		r.biFuncCoefficients = append(r.biFuncCoefficients, biFuncCoefficient{
-			Func:        ManhattanDistance,
-			Coefficient: coefficient,
-		})
-	}
-}
-
-// WithJaccardSimilarity sets the JaccardSimilarity function with a coefficient.
-func WithJaccardSimilarity(coefficient float64) Option {
-	return func(r *Router) {
-		r.biFuncCoefficients = append(r.biFuncCoefficients, biFuncCoefficient{
-			Func:        JaccardSimilarity,
-			Coefficient: coefficient,
-		})
-	}
-}
-
-// WithPearsonCorrelation sets the PearsonCorrelation function with a coefficient.
-func WithPearsonCorrelation(coefficient float64) Option {
-	return func(r *Router) {
-		r.biFuncCoefficients = append(r.biFuncCoefficients, biFuncCoefficient{
-			Func:        PearsonCorrelation,
-			Coefficient: coefficient,
-		})
-	}
-}
+// handler is a function that takes two vectors and returns a float64.
+//
+// It also returns an error if there is an error during the comparison.
+//
+// It is used to compare the similarity between two vectors.
+type handler func(queryVec *mat.VecDense, indexVec *mat.VecDense) (float64, error)

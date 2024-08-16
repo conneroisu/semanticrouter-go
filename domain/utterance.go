@@ -3,8 +3,6 @@ package domain
 import (
 	"encoding/json"
 	"fmt"
-
-	"github.com/uptrace/bun"
 )
 
 // Embedding is the embedding of some text, speech, or other data (images, videos, etc.).
@@ -12,19 +10,19 @@ type Embedding []float64
 
 // Utterance represents a utterance in the semantic router.
 type Utterance struct {
-	*bun.BaseModel `          bun:"table:utterances"`
 	// ID is the ID of the utterance.
-	ID int `bun:"id,pk,autoincrement"`
+	ID int
 	// Utterance is the utterance.
-	Utterance string `bun:"utterance"`
+	Utterance string
 	// EmbeddingBytes is the embedding of the utterance.
-	EmbeddingBytes []byte `bun:"embedding"           json:"embedding"`
+	EmbeddingBytes []byte
 	// Embed is the Embed of the utterance.
 	Embed Embedding
 }
 
 // UtterancePrime represents a utterance in the semantic router.
 type UtterancePrime struct {
+	Utterance string    `json:"utterance,omitempty"`
 	Embedding []float64 `json:"embedding"` // Embedding is the embedding of the utterance.
 }
 

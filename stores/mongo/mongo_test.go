@@ -5,51 +5,42 @@ import (
 	"log"
 	"testing"
 
+	semanticrouter "github.com/conneroisu/go-semantic-router"
+	"github.com/conneroisu/go-semantic-router/domain"
 	"github.com/conneroisu/go-semantic-router/stores/mongo"
+	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go/modules/mongodb"
 )
 
+var (
+	_ semanticrouter.Store = (*mongo.Store)(nil)
+)
+
 func TestStore(t *testing.T) {
+	a := assert.New(t)
 	ctx := context.Background()
 
 	mongodbContainer, err := mongodb.Run(ctx, "mongo:6")
-	if err != nil {
-		log.Fatalf("failed to start container: %s", err)
-	}
-
-	// Clean up the container
+	a.NoError(err)
 	defer func() {
 		if err := mongodbContainer.Terminate(ctx); err != nil {
 			log.Fatalf("failed to terminate container: %s", err)
 		}
 	}()
-
-	// Get the MongoDB URI
 	uri, err := mongodbContainer.ConnectionString(ctx)
-	if err != nil {
-		log.Fatalf("failed to get connection string: %s", err)
-	}
-
-	// Create a new MongoDB store
+	a.NoError(err)
 	store, err := mongo.New(uri, "test", "test")
-	if err != nil {
-		log.Fatalf("failed to create store: %s", err)
-	}
-
+	a.NoError(err)
 	err = store.Store(
 		ctx,
-		"key",
-		[]float64{1.0, 2.0, 3.0, 4.0, 5.0},
+		domain.Utterance{
+			Utterance: "key",
+			Embed:     []float64{1.0, 2.0, 3.0, 4.0, 5.0},
+		},
 	)
-	if err != nil {
-		log.Fatalf("failed to set key: %s", err)
-	}
+	a.NoError(err)
 
 	floats, err := store.Get(ctx, "key")
-	if err != nil {
-		log.Fatalf("failed to get key: %s", err)
-	}
-	if len(floats) != 5 {
-		log.Fatalf("expected length of floats to be 5, got %d", len(floats))
-	}
+	a.NoError(err)
+	a.Len(floats, 5)
 }

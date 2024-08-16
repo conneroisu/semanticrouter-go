@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/conneroisu/go-semantic-router/domain"
 	"go.mongodb.org/mongo-driver/bson"
@@ -23,7 +22,6 @@ func New(uri string, db, collection string) (*Store, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return &Store{
 		mdb:  client,
 		coll: client.Database(db).Collection(collection),
@@ -38,32 +36,20 @@ func (s *Store) Get(ctx context.Context, utterance string) ([]float64, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer cur.Close(ctx)
-	for cur.Next(ctx) {
-		var doc bson.M
-		if err := cur.Decode(&doc); err != nil {
-			return nil, err
-		}
-		floats = append(floats, doc["embedding"].([]float64)...)
+	var results []domain.Utterance
+	if err = cur.All(ctx, &results); err != nil {
+		panic(err)
 	}
+	for _, result := range results {
+		floats = append(floats, result.Embed...)
+	}
+	defer cur.Close(ctx)
 	return floats, nil
 }
 
-// Store stores a value in the store.
-func (s *Store) Store(ctx context.Context, utterance string, value []float64) error {
-	jsonValue, err := json.Marshal(domain.UtterancePrime{Embedding: value})
-	if err != nil {
-		return err
-	}
-	filter := bson.M{"utterance": utterance}
-	update := bson.M{"$set": bson.M{"utterance": utterance, "embedding": jsonValue}}
-
-	result, err := s.coll.InsertOne(ctx,
-		bson.D{
-			{Key: "utterance", Value: utterance},
-			{Key: "embedding", Value: jsonValue},
-		},
-	)
+// Set stores a value in the store.
+func (s *Store) Store(ctx context.Context, keyValPair domain.Utterance) error {
+	_, err := s.coll.InsertOne(ctx, keyValPair)
 	if err != nil {
 		return err
 	}

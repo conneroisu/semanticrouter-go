@@ -15,18 +15,24 @@ import (
 //
 // Match can be called on a Router to find the best route for a given utterance.
 type Router struct {
-	Routes             []Route             `json:"routes"  yaml:"routes"  toml:"routes"`  // Routes is a slice of Routes.
-	Encoder            Encoder             `json:"encoder" yaml:"encoder" toml:"encoder"` // Encoder is an Encoder that encodes utterances into vectors.
-	Storage            Store               `json:"storage" yaml:"storage" toml:"storage"` // Storage is a Store that stores the utterances.
-	biFuncCoefficients []biFuncCoefficient // biFuncCoefficients is a slice of biFuncCoefficients that represent the bi-function coefficients.
+	Routes      []Route             // Routes is a slice of Routes.
+	Encoder     Encoder             // Encoder is an Encoder that encodes utterances into vectors.
+	Storage     Store               // Storage is a Store that stores the utterances.
+	biFuncCoeff []biFuncCoefficient // biFuncCoefficients is a slice of biFuncCoefficients that represent the bi-function coefficients.
 }
 
 // Route represents a route in the semantic router.
 //
 // It is a struct that contains a name and a slice of Utterances.
 type Route struct {
-	Name       string             `json:"name"       yaml:"name"       toml:"name"`       // Name is the name of the route.
-	Utterances []domain.Utterance `json:"utterances" yaml:"utterances" toml:"utterances"` // Utterances is a slice of Utterances.
+	Name       string             // Name is the name of the route.
+	Utterances []domain.Utterance // Utterances is a slice of Utterances.
+}
+
+// biFuncCoefficient is an struct that represents a function and it's coefficient.
+type biFuncCoefficient struct {
+	handler     handler
+	coefficient float64
 }
 
 // NewRouter creates a new semantic router.
@@ -120,7 +126,10 @@ func (r *Router) Match(
 					continue
 				}
 				indexVec := mat.NewVecDense(emLen, em)
-				simScore := r.computeScore(queryVec, indexVec)
+				simScore, err := r.computeScore(queryVec, indexVec)
+				if err != nil {
+					return err
+				}
 				if simScore > bestScore {
 					bestScore = simScore
 					bestRouteName = route.Name
@@ -147,10 +156,15 @@ func (r *Router) Match(
 //
 // Additionally, it leverages the router's biFuncCoefficients to apply different
 // weighting factors to functions to get the similarity score.
-func (r *Router) computeScore(queryVec *mat.VecDense, indexVec *mat.VecDense) float64 {
+func (r *Router) computeScore(queryVec *mat.VecDense, indexVec *mat.VecDense) (float64, error) {
 	score := 0.0
-	for _, fn := range r.biFuncCoefficients {
-		score += fn.Coefficient * fn.Func(queryVec, indexVec)
+	for _, fn := range r.biFuncCoeff {
+
+		interScore, err := fn.handler(queryVec, indexVec)
+		if err != nil {
+			return 0.0, err
+		}
+		score += fn.coefficient * interScore
 	}
-	return score
+	return score, nil
 }

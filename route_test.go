@@ -1,8 +1,9 @@
-package semanticrouter
+package semanticrouter_test
 
 import (
 	"testing"
 
+	semanticrouter "github.com/conneroisu/go-semantic-router"
 	"github.com/conneroisu/go-semantic-router/domain"
 	"github.com/conneroisu/go-semantic-router/encoders/ollama"
 	"github.com/conneroisu/go-semantic-router/stores/memory"
@@ -12,7 +13,7 @@ import (
 
 // NoteworthyRoutes represents a set of routes that are noteworthy.
 // noteworthy here means that the routes are likely to be relevant to a noteworthy conversation in a veterinarian appointment.
-var NoteworthyRoutes = Route{
+var NoteworthyRoutes = semanticrouter.Route{
 	Name: "noteworthy",
 	Utterances: []domain.Utterance{
 		{Utterance: "what is the best way to treat a dog with a cold?"},
@@ -22,7 +23,7 @@ var NoteworthyRoutes = Route{
 
 // ChitchatRoutes represents a set of routes that are chitchat.
 // chitchat here means that the routes are likely to be relevant to a chitchat conversation in a veterinarian appointment.
-var ChitchatRoutes = Route{
+var ChitchatRoutes = semanticrouter.Route{
 	Name: "chitchat",
 	Utterances: []domain.Utterance{
 		{Utterance: "what is your favorite color?"},
@@ -38,8 +39,8 @@ func TestNewRouter(t *testing.T) {
 		t.Fatal(err)
 	}
 	stor := memory.NewStore()
-	rout, err := NewRouter(
-		[]Route{NoteworthyRoutes, ChitchatRoutes},
+	rout, err := semanticrouter.NewRouter(
+		[]semanticrouter.Route{NoteworthyRoutes, ChitchatRoutes},
 		ollama.NewEncoder(client, "all-minilm"),
 		stor,
 	)
