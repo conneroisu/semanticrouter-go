@@ -1,11 +1,10 @@
-package semanticrouter_test
+package semanticrouter
 
 import (
 	"fmt"
 	"math"
 	"testing"
 
-	semanticrouter "github.com/conneroisu/go-semantic-router"
 	"github.com/stretchr/testify/assert"
 	"gonum.org/v1/gonum/floats"
 	"gonum.org/v1/gonum/mat"
@@ -196,7 +195,10 @@ func TestSimilarityMatrix(t *testing.T) {
 				t.Parallel()
 				query := createVecDense(tc.queryVec)
 				index := createVecDense(tc.indexVec)
-				similarity, err := semanticrouter.SimilarityDotMatrix(query, index)
+				similarity, err := similarityDotMatrix(
+					query,
+					index,
+				)
 				a.NoError(err)
 
 				expected := []float64{tc.expectedSim}
@@ -231,7 +233,7 @@ func TestSimilarityDotMatrix(t *testing.T) {
 		a := assert.New(t)
 		xq := mat.NewVecDense(len(tt.xq), tt.xq)
 		index := mat.NewVecDense(len(tt.index), tt.index)
-		got, err := semanticrouter.SimilarityDotMatrix(xq, index)
+		got, err := similarityDotMatrix(xq, index)
 		a.NoError(err)
 		if math.Abs(got-tt.want) > 1e-9 {
 			t.Errorf(
@@ -260,7 +262,7 @@ func TestEuclideanDistance(t *testing.T) {
 		a := assert.New(t)
 		xq := mat.NewVecDense(len(tt.xq), tt.xq)
 		index := mat.NewVecDense(len(tt.index), tt.index)
-		got, err := semanticrouter.EuclideanDistance(xq, index)
+		got, err := euclideanDistance(xq, index)
 		a.NoError(err)
 		if math.Abs(got-tt.want) > 1e-9 {
 			t.Errorf(
@@ -289,7 +291,7 @@ func TestManhattanDistance(t *testing.T) {
 		a := assert.New(t)
 		xq := mat.NewVecDense(len(tt.xq), tt.xq)
 		index := mat.NewVecDense(len(tt.index), tt.index)
-		got, err := semanticrouter.ManhattanDistance(xq, index)
+		got, err := manhattanDistance(xq, index)
 		a.NoError(err)
 		if math.Abs(got-tt.want) > 1e-9 {
 			t.Errorf(
@@ -318,7 +320,7 @@ func TestJaccardSimilarity(t *testing.T) {
 		a := assert.New(t)
 		xq := mat.NewVecDense(len(tt.xq), tt.xq)
 		index := mat.NewVecDense(len(tt.index), tt.index)
-		got, err := semanticrouter.JaccardSimilarity(xq, index)
+		got, err := jaccardSimilarity(xq, index)
 		a.NoError(err)
 		if math.Abs(got-tt.want) > 1e-9 {
 			t.Errorf(
@@ -346,7 +348,7 @@ func TestPearsonCorrelation(t *testing.T) {
 		a := assert.New(t)
 		xq := mat.NewVecDense(len(tt.xq), tt.xq)
 		index := mat.NewVecDense(len(tt.index), tt.index)
-		got, err := semanticrouter.PearsonCorrelation(xq, index)
+		got, err := pearsonCorrelation(xq, index)
 		a.NoError(err)
 		if math.IsNaN(tt.want) {
 			if !math.IsNaN(got) {
@@ -379,7 +381,7 @@ func TestHammingDistance(t *testing.T) {
 		a := assert.New(t)
 		xq := mat.NewVecDense(len(tt.xq), tt.xq)
 		index := mat.NewVecDense(len(tt.index), tt.index)
-		got, err := semanticrouter.HammingDistance(xq, index)
+		got, err := hammingDistance(xq, index)
 		a.NoError(err)
 		if math.Abs(got-tt.want) > 1e-9 {
 			t.Errorf(
@@ -409,7 +411,7 @@ func TestMinkowskiDistance(t *testing.T) {
 		a := assert.New(t)
 		xq := mat.NewVecDense(len(tt.xq), tt.xq)
 		index := mat.NewVecDense(len(tt.index), tt.index)
-		got, err := semanticrouter.MinkowskiDistance(xq, index, tt.p)
+		got, err := minkowskiDistance(xq, index, tt.p)
 		a.NoError(err)
 		if math.Abs(got-tt.want) > 1e-9 {
 			t.Errorf(
@@ -457,7 +459,7 @@ func TestNormalizeScores(t *testing.T) {
 		{input: []float64{-1.0, 0.0, 1.0}, expected: []float64{0.0, 0.5, 1.0}},
 	}
 	for _, tc := range testCases {
-		result := semanticrouter.NormalizeScores(tc.input)
+		result := NormalizeScores(tc.input)
 		for i, v := range result {
 			if v != tc.expected[i] {
 				t.Errorf(

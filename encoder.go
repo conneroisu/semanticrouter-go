@@ -4,7 +4,6 @@ import (
 	"context"
 	"io"
 
-	"github.com/conneroisu/go-semantic-router/domain"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -28,7 +27,7 @@ type Store interface {
 // Storer is an interface that defines a method, Store, which takes a []float64
 // and stores it in a some sort of data store.
 type Storer interface {
-	Store(ctx context.Context, keyValPair domain.Utterance) error
+	Store(ctx context.Context, keyValPair Utterance) error
 }
 
 // Getter is an interface that defines a method, Get, which takes a

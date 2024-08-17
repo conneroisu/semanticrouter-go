@@ -8,6 +8,19 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
+// embedding is the embedding of some text, speech, or other data (images, videos, etc.).
+type embedding []float64
+
+// Utterance represents a utterance in the semantic router.
+type Utterance struct {
+	// ID is the ID of the utterance.
+	ID int
+	// Utterance is the text of the utterance.
+	Utterance string
+	// Embed is the embedding of the utterance. It is a vector of floats.
+	Embed embedding
+}
+
 // NormalizeScores normalizes the similarity scores to a 0-1 range.
 // The function takes a slice of float64 values representing the similarity
 // scores.
@@ -30,51 +43,61 @@ func NormalizeScores(sim []float64) []float64 {
 	return normalized
 }
 
-// WithSimilarityDotMatrix sets the similarity function to use with a coefficient.
+// WithSimilarityDotMatrix sets the similarity function to use with a
+// coefficient.
 func WithSimilarityDotMatrix(coefficient float64) Option {
 	return func(r *Router) {
 		r.biFuncCoeff = append(r.biFuncCoeff, biFuncCoefficient{
-			handler:     SimilarityDotMatrix,
+			handler:     similarityDotMatrix,
 			coefficient: coefficient,
 		})
 	}
 }
 
 // WithEuclideanDistance sets the EuclideanDistance function with a coefficient.
+//
+// $$d(x, y) = \sqrt{\sum_{i=1}^{n}(x_i - y_i)^2}$$
 func WithEuclideanDistance(coefficient float64) Option {
 	return func(r *Router) {
 		r.biFuncCoeff = append(r.biFuncCoeff, biFuncCoefficient{
-			handler:     EuclideanDistance,
+			handler:     euclideanDistance,
 			coefficient: coefficient,
 		})
 	}
 }
 
 // WithManhattanDistance sets the ManhattanDistance function with a coefficient.
+//
+// $$d(x, y) = |x_1 - y_1| + |x_2 - y_2| + ... + |x_n - y_n|$$
 func WithManhattanDistance(coefficient float64) Option {
 	return func(r *Router) {
 		r.biFuncCoeff = append(r.biFuncCoeff, biFuncCoefficient{
-			handler:     ManhattanDistance,
+			handler:     manhattanDistance,
 			coefficient: coefficient,
 		})
 	}
 }
 
 // WithJaccardSimilarity sets the JaccardSimilarity function with a coefficient.
+//
+// $$J(A, B)=\frac{|A \cap B|}{|A \cup B|}$$
 func WithJaccardSimilarity(coefficient float64) Option {
 	return func(r *Router) {
 		r.biFuncCoeff = append(r.biFuncCoeff, biFuncCoefficient{
-			handler:     JaccardSimilarity,
+			handler:     jaccardSimilarity,
 			coefficient: coefficient,
 		})
 	}
 }
 
-// WithPearsonCorrelation sets the PearsonCorrelation function with a coefficient.
+// WithPearsonCorrelation sets the PearsonCorrelation function with a
+// coefficient.
+//
+// $$r=\frac{\sum\left(x_{i}-\bar{x}\right)\left(y_{i}-\bar{y}\right)}{\sqrt{\sum\left(x_{i}-\bar{x}\right)^{2} \sum\left(y_{i}-\bar{y}\right)^{2}}}$$
 func WithPearsonCorrelation(coefficient float64) Option {
 	return func(r *Router) {
 		r.biFuncCoeff = append(r.biFuncCoeff, biFuncCoefficient{
-			handler:     PearsonCorrelation,
+			handler:     pearsonCorrelation,
 			coefficient: coefficient,
 		})
 	}
@@ -92,7 +115,7 @@ func WithPearsonCorrelation(coefficient float64) Option {
 // The similarity matrix returned is a matrix where each element is reduced to
 // the similarity score between the query vector and the corresponding index
 // vector.
-func SimilarityDotMatrix(xq, index *mat.VecDense) (float64, error) {
+func similarityDotMatrix(xq, index *mat.VecDense) (float64, error) {
 	// normalize the query vector
 	xqNorm := mat.Norm(xq, 2)
 	// normalize the index vector
@@ -113,13 +136,13 @@ func SimilarityDotMatrix(xq, index *mat.VecDense) (float64, error) {
 //
 // The function takes two vectors as input and returns the Euclidean distance
 // between them.
-func EuclideanDistance(xq, index *mat.VecDense) (float64, error) {
+func euclideanDistance(xq, index *mat.VecDense) (float64, error) {
 	diff := mat.NewVecDense(xq.Len(), nil)
 	diff.SubVec(xq, index)
 	return mat.Norm(diff, 2), nil
 }
 
-// ManhattanDistance calculates the Manhattan distance between two vectors.
+// manhattanDistance calculates the Manhattan distance between two vectors.
 //
 // The manhattan distance is the sum of the absolute differences between
 // corresponding elements in the two vectors.
@@ -127,7 +150,7 @@ func EuclideanDistance(xq, index *mat.VecDense) (float64, error) {
 // $$d(x, y) = |x_1 - y_1| + |x_2 - y_2| + ... + |x_n - y_n|$$
 //
 // The function takes two vectors as input and returns the Manhattan distance between them.
-func ManhattanDistance(xq, index *mat.VecDense) (float64, error) {
+func manhattanDistance(xq, index *mat.VecDense) (float64, error) {
 	diff := mat.NewVecDense(xq.Len(), nil)
 	diff.SubVec(xq, index)
 	sum := 0.0
@@ -144,7 +167,7 @@ func ManhattanDistance(xq, index *mat.VecDense) (float64, error) {
 // $$J(A, B)=\frac{|A \cap B|}{|A \cup B|}$$
 //
 // The function takes two vectors as input and returns the Jaccard distance between them.
-func JaccardSimilarity(xq, index *mat.VecDense) (float64, error) {
+func jaccardSimilarity(xq, index *mat.VecDense) (float64, error) {
 	minSum := 0.0
 	maxSum := 0.0
 	for i := 0; i < xq.Len(); i++ {
@@ -164,19 +187,9 @@ func JaccardSimilarity(xq, index *mat.VecDense) (float64, error) {
 //
 // $$r=\frac{\sum\left(x_{i}-\bar{x}\right)\left(y_{i}-\bar{y}\right)}{\sqrt{\sum\left(x_{i}-\bar{x}\right)^{2} \sum\left(y_{i}-\bar{y}\right)^{2}}}$$
 //
-// $r$ correlation coefficient
-//
-// $x_{i}$ values of the $$x$$-variable in a sample
-//
-// $\bar{x}$ is the mean of the values of the $$x$$-variable
-//
-// $y_{i}$ are the values of the $$y$$-variable in a sample
-//
-// $\bar{y}$ is the mean of the values of the $$y$$-variable
-//
 // The function takes two vectors as input and returns the Pearson correlation
 // between them.
-func PearsonCorrelation(xq, index *mat.VecDense) (float64, error) {
+func pearsonCorrelation(xq, index *mat.VecDense) (float64, error) {
 	meanXq := floats.Sum(xq.RawVector().Data) / float64(xq.Len())
 	meanIndex := floats.Sum(index.RawVector().Data) / float64(index.Len())
 
@@ -203,7 +216,7 @@ func PearsonCorrelation(xq, index *mat.VecDense) (float64, error) {
 // $$d(x, y)=\frac{1}{n} \sum_{n=1}^{n=n}\left|x_{i}-y_{i}\right|$$
 //
 // The function takes two vectors as input and returns the Hamming distance between them.
-func HammingDistance(xq, index *mat.VecDense) (float64, error) {
+func hammingDistance(xq, index *mat.VecDense) (float64, error) {
 	if xq.Len() != index.Len() {
 		return 0, fmt.Errorf("Vectors must be the same length")
 	}
@@ -226,7 +239,7 @@ func HammingDistance(xq, index *mat.VecDense) (float64, error) {
 // $$ d(x, y) = \sum_{i=1}^{n} |x_i - y_i|^p $$
 //
 // where n is the length of the vectors.
-func MinkowskiDistance(xq, index *mat.VecDense, p float64) (float64, error) {
+func minkowskiDistance(xq, index *mat.VecDense, p float64) (float64, error) {
 	if p <= 0 {
 		panic("Order p must be greater than 0")
 	}

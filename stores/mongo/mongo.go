@@ -3,7 +3,7 @@ package mongo
 import (
 	"context"
 
-	"github.com/conneroisu/go-semantic-router/domain"
+	"github.com/conneroisu/semanticrouter-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -36,7 +36,7 @@ func (s *Store) Get(ctx context.Context, utterance string) ([]float64, error) {
 	if err != nil {
 		return nil, err
 	}
-	var results []domain.Utterance
+	var results []semanticrouter.Utterance
 	if err = cur.All(ctx, &results); err != nil {
 		panic(err)
 	}
@@ -48,7 +48,7 @@ func (s *Store) Get(ctx context.Context, utterance string) ([]float64, error) {
 }
 
 // Set stores a value in the store.
-func (s *Store) Store(ctx context.Context, keyValPair domain.Utterance) error {
+func (s *Store) Store(ctx context.Context, keyValPair semanticrouter.Utterance) error {
 	_, err := s.coll.InsertOne(ctx, keyValPair)
 	if err != nil {
 		return err

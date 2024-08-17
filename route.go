@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/conneroisu/go-semantic-router/domain"
 	"golang.org/x/sync/errgroup"
 	"gonum.org/v1/gonum/mat"
 )
@@ -19,14 +18,22 @@ type Router struct {
 	Encoder     Encoder             // Encoder is an Encoder that encodes utterances into vectors.
 	Storage     Store               // Storage is a Store that stores the utterances.
 	biFuncCoeff []biFuncCoefficient // biFuncCoefficients is a slice of biFuncCoefficients that represent the bi-function coefficients.
+	workers     int                 // workers is the number of workers to use for computing similarity scores.
+}
+
+// WithWorkers sets the number of workers to use for computing similarity scores.
+func WithWorkers(workers int) Option {
+	return func(r *Router) {
+		r.workers = workers
+	}
 }
 
 // Route represents a route in the semantic router.
 //
 // It is a struct that contains a name and a slice of Utterances.
 type Route struct {
-	Name       string             // Name is the name of the route.
-	Utterances []domain.Utterance // Utterances is a slice of Utterances.
+	Name       string      // Name is the name of the route.
+	Utterances []Utterance // Utterances is a slice of Utterances.
 }
 
 // biFuncCoefficient is an struct that represents a function and it's coefficient.
@@ -52,6 +59,7 @@ func NewRouter(
 			WithManhattanDistance(1.0),
 			WithJaccardSimilarity(1.0),
 			WithPearsonCorrelation(1.0),
+			WithWorkers(1),
 		}
 	}
 	for _, opt := range opts {
@@ -67,10 +75,7 @@ func NewRouter(
 			if err != nil {
 				return nil, fmt.Errorf("error encoding utterance: %w", err)
 			}
-			err = utter.SetEmbedding(en)
-			if err != nil {
-				return nil, fmt.Errorf("error encoding utterance: %w", err)
-			}
+			utter.Embed = en
 			err = store.Store(ctx, utter)
 			if err != nil {
 				return nil,
@@ -97,57 +102,44 @@ func NewRouter(
 func (r *Router) Match(
 	ctx context.Context,
 	utterance string,
-) (bestRouteName string, bestScore float64, err error) {
-	eg, ctx := errgroup.WithContext(ctx)
-	eg.Go(func() error {
-		encoding, err := r.Encoder.Encode(ctx, utterance)
-		if err != nil {
-			return ErrEncoding{
-				Message: fmt.Sprintf(
-					"error encoding utterance: %s",
-					utterance,
-				),
-			}
+) (bestRoute *Route, bestScore float64, err error) {
+	encoding, err := r.Encoder.Encode(ctx, utterance)
+	if err != nil {
+		return nil, 0.0, ErrEncoding{
+			Message: fmt.Sprintf(
+				"error encoding utterance: %s",
+				utterance,
+			),
 		}
-		queryVec := mat.NewVecDense(len(encoding), encoding)
-		for _, route := range r.Routes {
-			for _, ut := range route.Utterances {
-				em, err := r.Storage.Get(ctx, ut.Utterance)
-				if err != nil {
-					return ErrGetEmbedding{
-						Message: fmt.Sprintf(
-							"error getting embedding: %s",
-							ut.Utterance,
-						),
-					}
-				}
-				emLen := len(em)
-				if emLen != queryVec.Len() {
-					continue
-				}
-				indexVec := mat.NewVecDense(emLen, em)
-				simScore, err := r.computeScore(queryVec, indexVec)
-				if err != nil {
-					return err
-				}
-				if simScore > bestScore {
-					bestScore = simScore
-					bestRouteName = route.Name
-				}
-			}
-		}
-		if bestRouteName == "" {
-			return ErrNoRouteFound{
-				Message:   "no route found",
-				Utterance: utterance,
-			}
-		}
-		return nil
-	})
-	if err := eg.Wait(); err != nil {
-		return "", 0.0, fmt.Errorf("no route found: %w", err)
 	}
-	return bestRouteName, bestScore, nil
+	queryVec := mat.NewVecDense(len(encoding), encoding)
+	for _, route := range r.Routes {
+		for _, ut := range route.Utterances {
+			em, err := r.Storage.Get(ctx, ut.Utterance)
+			if err != nil {
+				return nil, 0.0, ErrGetEmbedding{
+					Message: fmt.Sprintf(
+						"error getting embedding: %s",
+						ut.Utterance,
+					),
+				}
+			}
+			emLen := len(em)
+			if emLen != queryVec.Len() {
+				continue
+			}
+			indexVec := mat.NewVecDense(emLen, em)
+			simScore, err := r.computeScore(queryVec, indexVec)
+			if err != nil {
+				return nil, 0.0, err
+			}
+			if simScore > bestScore {
+				bestScore = simScore
+				bestRoute = &route
+			}
+		}
+	}
+	return bestRoute, bestScore, nil
 }
 
 // computeScore computes the score for a given utterance and route.
@@ -156,15 +148,22 @@ func (r *Router) Match(
 //
 // Additionally, it leverages the router's biFuncCoefficients to apply different
 // weighting factors to functions to get the similarity score.
-func (r *Router) computeScore(queryVec *mat.VecDense, indexVec *mat.VecDense) (float64, error) {
+func (r *Router) computeScore(
+	queryVec *mat.VecDense,
+	indexVec *mat.VecDense,
+) (float64, error) {
 	score := 0.0
+	eg := errgroup.Group{}
+	eg.SetLimit(r.workers)
 	for _, fn := range r.biFuncCoeff {
-
-		interScore, err := fn.handler(queryVec, indexVec)
-		if err != nil {
-			return 0.0, err
-		}
-		score += fn.coefficient * interScore
+		eg.Go(func() error {
+			interScore, err := fn.handler(queryVec, indexVec)
+			if err != nil {
+				return err
+			}
+			score += fn.coefficient * interScore
+			return nil
+		})
 	}
-	return score, nil
+	return score, eg.Wait()
 }
