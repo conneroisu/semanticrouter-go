@@ -21,12 +21,6 @@ type Utterance struct {
 	Embed embedding
 }
 
-// UtterancePrime represents a utterance in the semantic router.
-type UtterancePrime struct {
-	Utterance string    `json:"utterance,omitempty"`
-	Embedding []float64 `json:"embedding"` // Embedding is the embedding of the utterance.
-}
-
 // NormalizeScores normalizes the similarity scores to a 0-1 range.
 // The function takes a slice of float64 values representing the similarity
 // scores.

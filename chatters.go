@@ -2,6 +2,12 @@ package semanticrouter
 
 import "context"
 
+// ChatMessage is a struct that represents a chat message.
+type ChatMessage struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
 // Chatter is an interface that defines a method, Chat, which takes a string
 // as input and returns a string as output.
 //
@@ -9,5 +15,5 @@ import "context"
 //
 // If the context is canceled, the context's error is returned if it is non-nil.
 type Chatter interface {
-	Chat(ctx context.Context, prompt string) (string, error)
+	Chat(ctx context.Context, prompt []ChatMessage) (string, error)
 }

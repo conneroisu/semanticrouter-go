@@ -150,9 +150,12 @@ func (r *Router) Match(
 // If the given context is canceled, the context's error is returned if it is non-nil.
 func (r *Router) MatchChat(
 	ctx context.Context,
-	utterance string,
+	utterance []ChatMessage,
 ) (*string, error) {
-	route, _, err := r.Match(ctx, utterance)
+	route, _, err := r.Match(
+		ctx,
+		utterance[len(utterance)-1].Content,
+	)
 	if err != nil {
 		return nil, err
 	}
