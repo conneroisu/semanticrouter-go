@@ -7,16 +7,16 @@ import (
 	"fmt"
 	"os"
 
-	semantic_router "github.com/conneroisu/go-semantic-router"
-	encoders "github.com/conneroisu/go-semantic-router/encoders/openai"
-	"github.com/conneroisu/go-semantic-router/stores/memory"
+	"github.com/conneroisu/semanticrouter-go"
+	opeenai "github.com/conneroisu/semanticrouter-go/encoders/openai"
+	"github.com/conneroisu/semanticrouter-go/stores/memory"
 	"github.com/sashabaranov/go-openai"
 )
 
 // PoliticsRoutes represents a set of routes that are noteworthy.
-var PoliticsRoutes = semantic_router.Route{
+var PoliticsRoutes = semanticrouter.Route{
 	Name: "politics",
-	Utterances: []semantic_router.Utterance{
+	Utterances: []semanticrouter.Utterance{
 		{Utterance: "isn't politics the best thing ever"},
 		{Utterance: "why don't you tell me about your political opinions"},
 		{Utterance: "don't you just love the president"},
@@ -26,9 +26,9 @@ var PoliticsRoutes = semantic_router.Route{
 }
 
 // ChitchatRoutes represents a set of routes that are noteworthy.
-var ChitchatRoutes = semantic_router.Route{
+var ChitchatRoutes = semanticrouter.Route{
 	Name: "chitchat",
-	Utterances: []semantic_router.Utterance{
+	Utterances: []semanticrouter.Utterance{
 		{Utterance: "how's the weather today?"},
 		{Utterance: "how are things going?"},
 		{Utterance: "lovely weather today"},
@@ -49,14 +49,14 @@ func main() {
 func run() error {
 	ctx := context.Background()
 	store := memory.NewStore()
-	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
-	router, err := semantic_router.NewRouter(
-		[]semantic_router.Route{
+	router, err := semanticrouter.NewRouter(
+		[]semanticrouter.Route{
 			PoliticsRoutes,
 			ChitchatRoutes,
 		},
-		encoders.Encoder{
-			Client: client,
+		opeenai.Encoder{
+			Client: openai.NewClient(os.Getenv("OPENAI_API_KEY")),
+			Model:  openai.AdaCodeSearchCode,
 		},
 		store,
 	)

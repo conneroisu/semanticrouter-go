@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/conneroisu/go-semantic-router/encoders/ollama"
+	"github.com/conneroisu/semanticrouter-go/encoders/ollama"
 	"github.com/ollama/ollama/api"
 	"github.com/stretchr/testify/assert"
 )

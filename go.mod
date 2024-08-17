@@ -1,4 +1,4 @@
-module github.com/conneroisu/go-semantic-router
+module github.com/conneroisu/semanticrouter-go
 
 go 1.22.5
 

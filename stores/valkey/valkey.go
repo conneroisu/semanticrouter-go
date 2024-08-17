@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 
-	semanticrouter "github.com/conneroisu/go-semantic-router"
+	"github.com/conneroisu/semanticrouter-go"
 	"github.com/redis/go-redis/v9"
 )
 

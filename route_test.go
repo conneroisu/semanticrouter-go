@@ -3,9 +3,9 @@ package semanticrouter_test
 import (
 	"testing"
 
-	semanticrouter "github.com/conneroisu/go-semantic-router"
-	"github.com/conneroisu/go-semantic-router/encoders/ollama"
-	"github.com/conneroisu/go-semantic-router/stores/memory"
+	"github.com/conneroisu/semanticrouter-go"
+	"github.com/conneroisu/semanticrouter-go/encoders/ollama"
+	"github.com/conneroisu/semanticrouter-go/stores/memory"
 	"github.com/ollama/ollama/api"
 	"github.com/stretchr/testify/assert"
 )

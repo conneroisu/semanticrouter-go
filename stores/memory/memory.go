@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	semanticrouter "github.com/conneroisu/go-semantic-router"
+	"github.com/conneroisu/semanticrouter-go"
 )
 
 // Store is a simple key-value store for embeddings.

@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	semanticrouter "github.com/conneroisu/go-semantic-router"
-	"github.com/conneroisu/go-semantic-router/stores/memory"
+	"github.com/conneroisu/semanticrouter-go"
+	"github.com/conneroisu/semanticrouter-go/stores/memory"
 	"github.com/stretchr/testify/assert"
 )
 

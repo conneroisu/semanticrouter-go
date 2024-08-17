@@ -3,7 +3,7 @@ package mongo
 import (
 	"context"
 
-	semanticrouter "github.com/conneroisu/go-semantic-router"
+	"github.com/conneroisu/semanticrouter-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

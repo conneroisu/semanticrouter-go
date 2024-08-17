@@ -5,8 +5,8 @@ import (
 	"log"
 	"testing"
 
-	semanticrouter "github.com/conneroisu/go-semantic-router"
-	"github.com/conneroisu/go-semantic-router/stores/mongo"
+	"github.com/conneroisu/semanticrouter-go"
+	"github.com/conneroisu/semanticrouter-go/stores/mongo"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go/modules/mongodb"
 )

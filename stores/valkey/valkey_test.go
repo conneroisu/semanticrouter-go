@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	semanticrouter "github.com/conneroisu/go-semantic-router"
-	"github.com/conneroisu/go-semantic-router/stores/valkey"
+	"github.com/conneroisu/semanticrouter-go"
+	"github.com/conneroisu/semanticrouter-go/stores/valkey"
 	clientLib "github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
