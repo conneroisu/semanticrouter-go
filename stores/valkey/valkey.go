@@ -49,7 +49,7 @@ func (s *Store) Get(
 	return utPr.Embed, nil
 }
 
-// Set sets a value in the valkey store.
+// Store sets a value in the valkey store.
 func (s *Store) Store(
 	ctx context.Context,
 	utterance semanticrouter.Utterance,

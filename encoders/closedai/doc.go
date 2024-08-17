@@ -1,2 +1,2 @@
-// Package openai provides encoders for OpenAI embedding models.
+// Package closedai provides encoders for OpenAI embedding models.
 package closedai
