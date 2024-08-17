@@ -204,7 +204,6 @@ func pearsonCorrelation(xq, index *mat.VecDense) (float64, error) {
 		varSumXq += diffXq * diffXq
 		varSumIndex += diffIndex * diffIndex
 	}
-
 	return numerator / (math.Sqrt(varSumXq) * math.Sqrt(varSumIndex)), nil
 }
 
@@ -218,7 +217,7 @@ func pearsonCorrelation(xq, index *mat.VecDense) (float64, error) {
 // The function takes two vectors as input and returns the Hamming distance between them.
 func hammingDistance(xq, index *mat.VecDense) (float64, error) {
 	if xq.Len() != index.Len() {
-		return 0, fmt.Errorf("Vectors must be the same length")
+		return 0, fmt.Errorf("vectors must be the same length")
 	}
 
 	count := 0.0
@@ -227,7 +226,6 @@ func hammingDistance(xq, index *mat.VecDense) (float64, error) {
 			count++
 		}
 	}
-
 	return count, nil
 }
 
@@ -250,6 +248,5 @@ func minkowskiDistance(xq, index *mat.VecDense, p float64) (float64, error) {
 	for i := 0; i < diff.Len(); i++ {
 		sum += math.Pow(math.Abs(diff.AtVec(i)), p)
 	}
-
 	return math.Pow(sum, 1/p), nil
 }
