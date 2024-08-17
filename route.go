@@ -18,6 +18,14 @@ type Router struct {
 	Encoder     Encoder             // Encoder is an Encoder that encodes utterances into vectors.
 	Storage     Store               // Storage is a Store that stores the utterances.
 	biFuncCoeff []biFuncCoefficient // biFuncCoefficients is a slice of biFuncCoefficients that represent the bi-function coefficients.
+	workers     int                 // workers is the number of workers to use for computing similarity scores.
+}
+
+// WithWorkers sets the number of workers to use for computing similarity scores.
+func WithWorkers(workers int) Option {
+	return func(r *Router) {
+		r.workers = workers
+	}
 }
 
 // Route represents a route in the semantic router.
@@ -51,6 +59,7 @@ func NewRouter(
 			WithManhattanDistance(1.0),
 			WithJaccardSimilarity(1.0),
 			WithPearsonCorrelation(1.0),
+			WithWorkers(1),
 		}
 	}
 	for _, opt := range opts {
@@ -157,13 +166,17 @@ func (r *Router) computeScore(
 	indexVec *mat.VecDense,
 ) (float64, error) {
 	score := 0.0
+	eg := errgroup.Group{}
+	eg.SetLimit(r.workers)
 	for _, fn := range r.biFuncCoeff {
-
-		interScore, err := fn.handler(queryVec, indexVec)
-		if err != nil {
-			return 0.0, err
-		}
-		score += fn.coefficient * interScore
+		eg.Go(func() error {
+			interScore, err := fn.handler(queryVec, indexVec)
+			if err != nil {
+				return err
+			}
+			score += fn.coefficient * interScore
+			return nil
+		})
 	}
-	return score, nil
+	return score, eg.Wait()
 }

@@ -1,10 +1,10 @@
-# go-semantic-router
+# semanticrouter-go
 
 <p align="center">
-    <a href="https://pkg.go.dev/github.com/conneroisu/go-semantic-router?tab=doc"><img src="https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white" alt="go.dev"></a>
-    <a href="https://github.com/conneroisu/go-semantic-router/actions/workflows/test.yaml"><img src="https://github.com/conneroisu/go-semantic-router/actions/workflows/test.yaml/badge.svg" alt="Build Status"></a>
-    <a href="https://codecov.io/gh/conneroisu/go-semantic-router" > <img src="https://codecov.io/gh/conneroisu/go-semantic-router/graph/badge.svg?token=JAGYI2V82D"/> </a>
-    <a href="https://goreportcard.com/report/github.com/conneroisu/go-semantic-router"><img src="https://goreportcard.com/badge/github.com/conneroisu/go-semantic-router" alt="Go Report Card"></a>
+    <a href="https://pkg.go.dev/github.com/conneroisu/semanticrouter-go?tab=doc"><img src="https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white" alt="go.dev"></a>
+    <a href="https://github.com/conneroisu/semanticrouter-go/actions/workflows/test.yaml"><img src="https://github.com/conneroisu/semanticrouter-go/actions/workflows/test.yaml/badge.svg" alt="Build Status"></a>
+    <a href="https://codecov.io/gh/conneroisu/semanticrouter-go" > <img src="https://codecov.io/gh/conneroisu/semanticrouter-go/graph/badge.svg?token=JAGYI2V82D"/> </a>
+    <a href="https://goreportcard.com/report/github.com/conneroisu/semanticrouter-go"><img src="https://goreportcard.com/badge/github.com/conneroisu/semanticrouter-go" alt="Go Report Card"></a>
     <a href="https://www.phorm.ai/query?projectId=fd665f24-5c41-42ed-907b-f322457a562d"><img src="https://img.shields.io/badge/Phorm-Ask_AI-%23F2777A.svg?&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNSIgaGVpZ2h0PSI0IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxwYXRoIGQ9Ik00LjQzIDEuODgyYTEuNDQgMS40NCAwIDAgMS0uMDk4LjQyNmMtLjA1LjEyMy0uMTE1LjIzLS4xOTI"
 </p>
 
@@ -17,35 +17,14 @@ A pure-go package for abstractly computing similarity scores between a query vec
 ## Installation
 
 ```bash
-go get github.com/conneroisu/go-semantic-router
+go get github.com/conneroisu/semanticrouter-go
 ```
-
-## Usage
-
-### OpenAI Encoder
-
-```go
-import "github.com/conneroisu/go-semantic-router/encoders/openai"
-```
-
-### Google Encoder
-
-```go
-import "github.com/conneroisu/go-semantic-router/encoders/google"
-```
-
-### Ollama Encoder
-
-```go
-import "github.com/conneroisu/go-semantic-router/encoders/ollama"
-```
-
 
 ### Conversational Agents Example
 
 ```go
 // Package main shows how to use the semantic router to find the best route for a given utterance
-// in the context of a chat bot or other conversational application.
+// in the context of a veterinarian appointment.
 package main
 
 import (
@@ -53,33 +32,29 @@ import (
 	"fmt"
 	"os"
 
-	semantic_router "github.com/conneroisu/go-semantic-router"
-	encoders "github.com/conneroisu/go-semantic-router/encoders/openai"
-	"github.com/conneroisu/go-semantic-router/stores/memory"
-	"github.com/sashabaranov/go-openai"
+	"github.com/conneroisu/semanticrouter-go"
+	"github.com/conneroisu/semanticrouter-go/encoders/ollama"
+	"github.com/conneroisu/semanticrouter-go/stores/memory"
+	"github.com/ollama/ollama/api"
 )
 
-// PoliticsRoutes represents a set of routes that are noteworthy.
-var PoliticsRoutes = semantic_router.Route{
-	Name: "politics",
-	Utterances: []semantic_router.Utterance{
-		{Utterance: "isn't politics the best thing ever"},
-		{Utterance: "why don't you tell me about your political opinions"},
-		{Utterance: "don't you just love the president"},
-		{Utterance: "they're going to destroy this country!"},
-		{Utterance: "they will save the country!"},
+// NoteworthyRoutes represents a set of routes that are noteworthy.
+// noteworthy here means that the routes are likely to be relevant to a noteworthy conversation in a veterinarian appointment.
+var NoteworthyRoutes = semanticrouter.Route{
+	Name: "noteworthy",
+	Utterances: []semanticrouter.Utterance{
+		{Utterance: "what is the best way to treat a dog with a cold?"},
+		{Utterance: "my cat has been limping, what should I do?"},
 	},
 }
 
-// ChitchatRoutes represents a set of routes that are noteworthy.
-var ChitchatRoutes = semantic_router.Route{
+// ChitchatRoutes represents a set of routes that are chitchat.
+// chitchat here means that the routes are likely to be relevant to a chitchat conversation in a veterinarian appointment.
+var ChitchatRoutes = semanticrouter.Route{
 	Name: "chitchat",
-	Utterances: []semantic_router.Utterance{
-		{Utterance: "how's the weather today?"},
-		{Utterance: "how are things going?"},
-		{Utterance: "lovely weather today"},
-		{Utterance: "the weather is horrendous"},
-		{Utterance: "let's go to the chippy"},
+	Utterances: []semanticrouter.Utterance{
+		{Utterance: "what is your favorite color?"},
+		{Utterance: "what is your favorite animal?"},
 	},
 }
 
@@ -94,29 +69,27 @@ func main() {
 // run runs the example.
 func run() error {
 	ctx := context.Background()
-	store := memory.NewStore()
-	client := openai.NewClient(os.Getenv("OPENAI_API_KEY"))
-	router, err := semantic_router.NewRouter(
-		[]semantic_router.Route{
-			PoliticsRoutes,
-			ChitchatRoutes,
+	cli, err := api.ClientFromEnvironment()
+	if err != nil {
+		return fmt.Errorf("error creating client: %w", err)
+	}
+	router, err := semanticrouter.NewRouter(
+		[]semanticrouter.Route{NoteworthyRoutes, ChitchatRoutes},
+		&ollama.Encoder{
+			Client: cli,
+			Model:  "mxbai-embed-large",
 		},
-		encoders.Encoder{
-			Client: client,
-		},
-		store,
+		memory.NewStore(),
 	)
 	if err != nil {
 		return fmt.Errorf("error creating router: %w", err)
 	}
-
 	finding, p, err := router.Match(ctx, "how's the weather today?")
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
-
-	fmt.Println("p:", p)
 	fmt.Println("Found:", finding)
+	fmt.Println("p:", p)
 	return nil
 }
 ```
@@ -145,17 +118,17 @@ import (
 	"fmt"
 	"os"
 
-	semantic_router "github.com/conneroisu/go-semantic-router"
-	"github.com/conneroisu/go-semantic-router/encoders/ollama"
-	"github.com/conneroisu/go-semantic-router/stores/memory"
+	"github.com/conneroisu/semanticrouter-go"
+	"github.com/conneroisu/semanticrouter-go/encoders/ollama"
+	"github.com/conneroisu/semanticrouter-go/stores/memory"
 	"github.com/ollama/ollama/api"
 )
 
 // NoteworthyRoutes represents a set of routes that are noteworthy.
 // noteworthy here means that the routes are likely to be relevant to a noteworthy conversation in a veterinarian appointment.
-var NoteworthyRoutes = semantic_router.Route{
+var NoteworthyRoutes = semanticrouter.Route{
 	Name: "noteworthy",
-	Utterances: []semantic_router.Utterance{
+	Utterances: []semanticrouter.Utterance{
 		{Utterance: "what is the best way to treat a dog with a cold?"},
 		{Utterance: "my cat has been limping, what should I do?"},
 	},
@@ -163,9 +136,9 @@ var NoteworthyRoutes = semantic_router.Route{
 
 // ChitchatRoutes represents a set of routes that are chitchat.
 // chitchat here means that the routes are likely to be relevant to a chitchat conversation in a veterinarian appointment.
-var ChitchatRoutes = semantic_router.Route{
+var ChitchatRoutes = semanticrouter.Route{
 	Name: "chitchat",
-	Utterances: []semantic_router.Utterance{
+	Utterances: []semanticrouter.Utterance{
 		{Utterance: "what is your favorite color?"},
 		{Utterance: "what is your favorite animal?"},
 	},
@@ -186,8 +159,8 @@ func run() error {
 	if err != nil {
 		return fmt.Errorf("error creating client: %w", err)
 	}
-	router, err := semantic_router.NewRouter(
-		[]semantic_router.Route{NoteworthyRoutes, ChitchatRoutes},
+	router, err := semanticrouter.NewRouter(
+		[]semanticrouter.Route{NoteworthyRoutes, ChitchatRoutes},
 		&ollama.Encoder{
 			Client: cli,
 			Model:  "mxbai-embed-large",
