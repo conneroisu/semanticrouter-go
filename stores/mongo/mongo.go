@@ -1,3 +1,4 @@
+// Package mongo provides a MongoDB store for embeddings.
 package mongo
 
 import (
