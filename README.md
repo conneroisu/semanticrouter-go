@@ -54,7 +54,6 @@ import (
 	"os"
 
 	semantic_router "github.com/conneroisu/go-semantic-router"
-	"github.com/conneroisu/go-semantic-router/domain"
 	encoders "github.com/conneroisu/go-semantic-router/encoders/openai"
 	"github.com/conneroisu/go-semantic-router/stores/memory"
 	"github.com/sashabaranov/go-openai"
@@ -63,7 +62,7 @@ import (
 // PoliticsRoutes represents a set of routes that are noteworthy.
 var PoliticsRoutes = semantic_router.Route{
 	Name: "politics",
-	Utterances: []domain.Utterance{
+	Utterances: []semantic_router.Utterance{
 		{Utterance: "isn't politics the best thing ever"},
 		{Utterance: "why don't you tell me about your political opinions"},
 		{Utterance: "don't you just love the president"},
@@ -75,7 +74,7 @@ var PoliticsRoutes = semantic_router.Route{
 // ChitchatRoutes represents a set of routes that are noteworthy.
 var ChitchatRoutes = semantic_router.Route{
 	Name: "chitchat",
-	Utterances: []domain.Utterance{
+	Utterances: []semantic_router.Utterance{
 		{Utterance: "how's the weather today?"},
 		{Utterance: "how are things going?"},
 		{Utterance: "lovely weather today"},
@@ -147,7 +146,6 @@ import (
 	"os"
 
 	semantic_router "github.com/conneroisu/go-semantic-router"
-	"github.com/conneroisu/go-semantic-router/domain"
 	"github.com/conneroisu/go-semantic-router/encoders/ollama"
 	"github.com/conneroisu/go-semantic-router/stores/memory"
 	"github.com/ollama/ollama/api"
@@ -157,7 +155,7 @@ import (
 // noteworthy here means that the routes are likely to be relevant to a noteworthy conversation in a veterinarian appointment.
 var NoteworthyRoutes = semantic_router.Route{
 	Name: "noteworthy",
-	Utterances: []domain.Utterance{
+	Utterances: []semantic_router.Utterance{
 		{Utterance: "what is the best way to treat a dog with a cold?"},
 		{Utterance: "my cat has been limping, what should I do?"},
 	},
@@ -167,7 +165,7 @@ var NoteworthyRoutes = semantic_router.Route{
 // chitchat here means that the routes are likely to be relevant to a chitchat conversation in a veterinarian appointment.
 var ChitchatRoutes = semantic_router.Route{
 	Name: "chitchat",
-	Utterances: []domain.Utterance{
+	Utterances: []semantic_router.Utterance{
 		{Utterance: "what is your favorite color?"},
 		{Utterance: "what is your favorite animal?"},
 	},
@@ -214,5 +212,4 @@ func run() error {
 The output of the veterinarian example is:
 ```bash
 Found: chitchat
-p: 0.4656368810166642
 ```

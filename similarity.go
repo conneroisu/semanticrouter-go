@@ -8,6 +8,25 @@ import (
 	"gonum.org/v1/gonum/mat"
 )
 
+// embedding is the embedding of some text, speech, or other data (images, videos, etc.).
+type embedding []float64
+
+// Utterance represents a utterance in the semantic router.
+type Utterance struct {
+	// ID is the ID of the utterance.
+	ID int
+	// Utterance is the text of the utterance.
+	Utterance string
+	// Embed is the embedding of the utterance. It is a vector of floats.
+	Embed embedding
+}
+
+// UtterancePrime represents a utterance in the semantic router.
+type UtterancePrime struct {
+	Utterance string    `json:"utterance,omitempty"`
+	Embedding []float64 `json:"embedding"` // Embedding is the embedding of the utterance.
+}
+
 // NormalizeScores normalizes the similarity scores to a 0-1 range.
 // The function takes a slice of float64 values representing the similarity
 // scores.

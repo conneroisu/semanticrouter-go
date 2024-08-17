@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	semanticrouter "github.com/conneroisu/go-semantic-router"
-	"github.com/conneroisu/go-semantic-router/domain"
 	"github.com/conneroisu/go-semantic-router/stores/mongo"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go/modules/mongodb"
@@ -33,7 +32,7 @@ func TestStore(t *testing.T) {
 	a.NoError(err)
 	err = store.Store(
 		ctx,
-		domain.Utterance{
+		semanticrouter.Utterance{
 			Utterance: "key",
 			Embed:     []float64{1.0, 2.0, 3.0, 4.0, 5.0},
 		},

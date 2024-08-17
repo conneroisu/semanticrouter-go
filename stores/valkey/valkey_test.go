@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	semanticrouter "github.com/conneroisu/go-semantic-router"
-	"github.com/conneroisu/go-semantic-router/domain"
 	"github.com/conneroisu/go-semantic-router/stores/valkey"
 	clientLib "github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
@@ -47,7 +46,7 @@ func TestStore(t *testing.T) {
 
 	err = store.Store(
 		ctx,
-		domain.Utterance{
+		semanticrouter.Utterance{
 			Utterance: "key",
 			Embed:     []float64{1.0, 2.0, 3.0, 4.0, 5.0},
 		},

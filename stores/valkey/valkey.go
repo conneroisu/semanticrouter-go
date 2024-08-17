@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/conneroisu/go-semantic-router/domain"
+	semanticrouter "github.com/conneroisu/go-semantic-router"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -41,7 +41,7 @@ func (s *Store) Get(
 		}
 		return nil, err
 	}
-	var utPr domain.Utterance
+	var utPr semanticrouter.Utterance
 	err = json.Unmarshal(bytes.NewBufferString(val).Bytes(), &utPr)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshaling embedding: %w", err)
@@ -52,7 +52,7 @@ func (s *Store) Get(
 // Set sets a value in the valkey store.
 func (s *Store) Store(
 	ctx context.Context,
-	utterance domain.Utterance,
+	utterance semanticrouter.Utterance,
 ) error {
 	val, err := json.Marshal(utterance)
 	if err != nil {

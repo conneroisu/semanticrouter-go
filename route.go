@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/conneroisu/go-semantic-router/domain"
 	"golang.org/x/sync/errgroup"
 	"gonum.org/v1/gonum/mat"
 )
@@ -25,8 +24,8 @@ type Router struct {
 //
 // It is a struct that contains a name and a slice of Utterances.
 type Route struct {
-	Name       string             // Name is the name of the route.
-	Utterances []domain.Utterance // Utterances is a slice of Utterances.
+	Name       string      // Name is the name of the route.
+	Utterances []Utterance // Utterances is a slice of Utterances.
 }
 
 // biFuncCoefficient is an struct that represents a function and it's coefficient.
@@ -67,10 +66,7 @@ func NewRouter(
 			if err != nil {
 				return nil, fmt.Errorf("error encoding utterance: %w", err)
 			}
-			err = utter.SetEmbedding(en)
-			if err != nil {
-				return nil, fmt.Errorf("error encoding utterance: %w", err)
-			}
+			utter.Embed = en
 			err = store.Store(ctx, utter)
 			if err != nil {
 				return nil,
