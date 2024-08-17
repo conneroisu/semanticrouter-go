@@ -217,7 +217,7 @@ func pearsonCorrelation(xq, index *mat.VecDense) (float64, error) {
 // The function takes two vectors as input and returns the Hamming distance between them.
 func hammingDistance(xq, index *mat.VecDense) (float64, error) {
 	if xq.Len() != index.Len() {
-		return 0, fmt.Errorf("vectors must be the same length")
+		return 0, fmt.Errorf("vectors must be the same length (are you mix mashing encoding models?)")
 	}
 
 	count := 0.0
