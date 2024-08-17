@@ -63,7 +63,7 @@ func run() error {
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
-	fmt.Println("Found:", finding)
+	fmt.Println("Found:", finding.Name)
 	fmt.Println("p:", p)
 	return nil
 }

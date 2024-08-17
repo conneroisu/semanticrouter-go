@@ -70,6 +70,6 @@ func run() error {
 	}
 
 	fmt.Println("p:", p)
-	fmt.Println("Found:", finding)
+	fmt.Println("Found:", finding.Name)
 	return nil
 }
