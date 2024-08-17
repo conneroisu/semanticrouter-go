@@ -34,7 +34,6 @@ func WithWorkers(workers int) Option {
 type Route struct {
 	Name       string      // Name is the name of the route.
 	Utterances []Utterance // Utterances is a slice of Utterances.
-	chatter    Chatter     // Chatter is the chatter to use for the route when MatchChat is called.
 }
 
 // biFuncCoefficient is an struct that represents a function and it's coefficient.
@@ -141,29 +140,6 @@ func (r *Router) Match(
 		}
 	}
 	return bestRoute, bestScore, nil
-}
-
-// MatchChat returns the route that matches the given chat.
-//
-// The score is the similarity score between the query vector and the index vector.
-//
-// If the given context is canceled, the context's error is returned if it is non-nil.
-func (r *Router) MatchChat(
-	ctx context.Context,
-	utterance []ChatMessage,
-) (*string, error) {
-	route, _, err := r.Match(
-		ctx,
-		utterance[len(utterance)-1].Content,
-	)
-	if err != nil {
-		return nil, err
-	}
-	if route.chatter == nil {
-		return nil, fmt.Errorf("route %s has no chatter", route.Name)
-	}
-	resp, err := route.chatter.Chat(ctx, utterance)
-	return &resp, err
 }
 
 // computeScore computes the score for a given utterance and route.
