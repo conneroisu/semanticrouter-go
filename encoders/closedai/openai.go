@@ -1,4 +1,4 @@
-package openai
+package closedai
 
 import (
 	"context"

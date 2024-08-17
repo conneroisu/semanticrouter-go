@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"github.com/conneroisu/semanticrouter-go"
-	opeenai "github.com/conneroisu/semanticrouter-go/encoders/openai"
+	"github.com/conneroisu/semanticrouter-go/encoders/closedai"
 	"github.com/conneroisu/semanticrouter-go/stores/memory"
 	"github.com/sashabaranov/go-openai"
 )
@@ -54,7 +54,7 @@ func run() error {
 			PoliticsRoutes,
 			ChitchatRoutes,
 		},
-		opeenai.Encoder{
+		closedai.Encoder{
 			Client: openai.NewClient(os.Getenv("OPENAI_API_KEY")),
 			Model:  openai.AdaCodeSearchCode,
 		},
