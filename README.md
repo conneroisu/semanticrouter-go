@@ -186,3 +186,38 @@ The output of the veterinarian example is:
 ```bash
 Found: chitchat
 ```
+
+## Development
+
+### Testing
+
+To run the tests, run the following command:
+
+```bash
+make test
+```
+
+### Making a new Store Implementation
+
+Implement the Store interface in the `stores` package.
+
+The store interface is defined as follows:
+
+```go
+type Store interface { // size=16 (0x10)
+	Storer
+	Getter
+	io.Closer
+}
+```
+
+Store is an interface that defines a method, Store, which takes a \[]float64 and stores it in a some sort of data store, and a method, Get, which takes a string and returns a \[]float64 from the data store.
+
+```go
+func (io.Closer) Close() error
+func (Getter) Get(ctx context.Context, key string) ([]float64, error)
+func (Storer) Store(ctx context.Context, keyValPair Utterance) error
+```
+
+[`semanticrouter.Store` on pkg.go.dev](https://pkg.go.dev/github.com/conneroisu/semanticrouter-go#Store)
+
