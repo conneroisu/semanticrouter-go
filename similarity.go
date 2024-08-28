@@ -45,6 +45,11 @@ func NormalizeScores(sim []float64) []float64 {
 
 // WithSimilarityDotMatrix sets the similarity function to use with a
 // coefficient.
+//
+// $$a \cdot b=\sum_{i=1}^{n} a_{i} b_{i}$$
+//
+// It adds the similarity dot matrix to the comparision functions with the given
+// coefficient.
 func WithSimilarityDotMatrix(coefficient float64) Option {
 	return func(r *Router) {
 		r.biFuncCoeffs = append(r.biFuncCoeffs, biFuncCoefficient{
@@ -84,6 +89,9 @@ func WithManhattanDistance(coefficient float64) Option {
 // WithJaccardSimilarity sets the JaccardSimilarity function with a coefficient.
 //
 // $$J(A, B)=\frac{|A \cap B|}{|A \cup B|}$$
+//
+// It adds the jaccard similarity to the comparision functions with the given
+// coefficient.
 func WithJaccardSimilarity(coefficient float64) Option {
 	return func(r *Router) {
 		r.biFuncCoeffs = append(r.biFuncCoeffs, biFuncCoefficient{
@@ -97,6 +105,9 @@ func WithJaccardSimilarity(coefficient float64) Option {
 // coefficient.
 //
 // $$r=\frac{\sum\left(x_{i}-\bar{x}\right)\left(y_{i}-\bar{y}\right)}{\sqrt{\sum\left(x_{i}-\bar{x}\right)^{2} \sum\left(y_{i}-\bar{y}\right)^{2}}}$$
+//
+// It adds the pearson correlation to the comparision functions with the given
+// coefficient.
 func WithPearsonCorrelation(coefficient float64) Option {
 	return func(r *Router) {
 		r.biFuncCoeffs = append(r.biFuncCoeffs, biFuncCoefficient{
