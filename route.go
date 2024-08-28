@@ -14,11 +14,11 @@ import (
 //
 // Match can be called on a Router to find the best route for a given utterance.
 type Router struct {
-	Routes      []Route             // Routes is a slice of Routes.
-	Encoder     Encoder             // Encoder is an Encoder that encodes utterances into vectors.
-	Storage     Store               // Storage is a Store that stores the utterances.
-	biFuncCoeff []biFuncCoefficient // biFuncCoefficients is a slice of biFuncCoefficients that represent the bi-function coefficients.
-	workers     int                 // workers is the number of workers to use for computing similarity scores.
+	Routes       []Route             // Routes is a slice of Routes.
+	Encoder      Encoder             // Encoder is an Encoder that encodes utterances into vectors.
+	Storage      Store               // Storage is a Store that stores the utterances.
+	biFuncCoeffs []biFuncCoefficient // biFuncCoefficients is a slice of biFuncCoefficients that represent the bi-function coefficients.
+	workers      int                 // workers is the number of workers to use for computing similarity scores.
 }
 
 // WithWorkers sets the number of workers to use for computing similarity scores.
@@ -113,6 +113,8 @@ func (r *Router) Match(
 		}
 	}
 	queryVec := mat.NewVecDense(len(encoding), encoding)
+	var simScore float64
+	var indexVec *mat.VecDense
 	for _, route := range r.Routes {
 		for _, ut := range route.Utterances {
 			em, err := r.Storage.Get(ctx, ut.Utterance)
@@ -128,8 +130,8 @@ func (r *Router) Match(
 			if emLen != queryVec.Len() {
 				continue
 			}
-			indexVec := mat.NewVecDense(emLen, em)
-			simScore, err := r.computeScore(queryVec, indexVec)
+			indexVec = mat.NewVecDense(emLen, em)
+			simScore, err = r.computeScore(queryVec, indexVec)
 			if err != nil {
 				return nil, 0.0, err
 			}
@@ -155,7 +157,7 @@ func (r *Router) computeScore(
 	score := 0.0
 	eg := errgroup.Group{}
 	eg.SetLimit(r.workers)
-	for _, fn := range r.biFuncCoeff {
+	for _, fn := range r.biFuncCoeffs {
 		eg.Go(func() error {
 			interScore, err := fn.handler(queryVec, indexVec)
 			if err != nil {

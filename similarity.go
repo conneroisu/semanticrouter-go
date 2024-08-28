@@ -47,7 +47,7 @@ func NormalizeScores(sim []float64) []float64 {
 // coefficient.
 func WithSimilarityDotMatrix(coefficient float64) Option {
 	return func(r *Router) {
-		r.biFuncCoeff = append(r.biFuncCoeff, biFuncCoefficient{
+		r.biFuncCoeffs = append(r.biFuncCoeffs, biFuncCoefficient{
 			handler:     similarityDotMatrix,
 			coefficient: coefficient,
 		})
@@ -59,7 +59,7 @@ func WithSimilarityDotMatrix(coefficient float64) Option {
 // $$d(x, y) = \sqrt{\sum_{i=1}^{n}(x_i - y_i)^2}$$
 func WithEuclideanDistance(coefficient float64) Option {
 	return func(r *Router) {
-		r.biFuncCoeff = append(r.biFuncCoeff, biFuncCoefficient{
+		r.biFuncCoeffs = append(r.biFuncCoeffs, biFuncCoefficient{
 			handler:     euclideanDistance,
 			coefficient: coefficient,
 		})
@@ -69,9 +69,12 @@ func WithEuclideanDistance(coefficient float64) Option {
 // WithManhattanDistance sets the ManhattanDistance function with a coefficient.
 //
 // $$d(x, y) = |x_1 - y_1| + |x_2 - y_2| + ... + |x_n - y_n|$$
+//
+// It adds the manhatten distance to the comparision functions with the given
+// coefficient.
 func WithManhattanDistance(coefficient float64) Option {
 	return func(r *Router) {
-		r.biFuncCoeff = append(r.biFuncCoeff, biFuncCoefficient{
+		r.biFuncCoeffs = append(r.biFuncCoeffs, biFuncCoefficient{
 			handler:     manhattanDistance,
 			coefficient: coefficient,
 		})
@@ -83,7 +86,7 @@ func WithManhattanDistance(coefficient float64) Option {
 // $$J(A, B)=\frac{|A \cap B|}{|A \cup B|}$$
 func WithJaccardSimilarity(coefficient float64) Option {
 	return func(r *Router) {
-		r.biFuncCoeff = append(r.biFuncCoeff, biFuncCoefficient{
+		r.biFuncCoeffs = append(r.biFuncCoeffs, biFuncCoefficient{
 			handler:     jaccardSimilarity,
 			coefficient: coefficient,
 		})
@@ -96,7 +99,7 @@ func WithJaccardSimilarity(coefficient float64) Option {
 // $$r=\frac{\sum\left(x_{i}-\bar{x}\right)\left(y_{i}-\bar{y}\right)}{\sqrt{\sum\left(x_{i}-\bar{x}\right)^{2} \sum\left(y_{i}-\bar{y}\right)^{2}}}$$
 func WithPearsonCorrelation(coefficient float64) Option {
 	return func(r *Router) {
-		r.biFuncCoeff = append(r.biFuncCoeff, biFuncCoefficient{
+		r.biFuncCoeffs = append(r.biFuncCoeffs, biFuncCoefficient{
 			handler:     pearsonCorrelation,
 			coefficient: coefficient,
 		})
@@ -234,7 +237,7 @@ func hammingDistance(xq, index *mat.VecDense) (float64, error) {
 // The Minkowski distance is the sum of the absolute differences between
 // corresponding elements in the two vectors raised to the power of p.
 //
-// $$ d(x, y) = \sum_{i=1}^{n} |x_i - y_i|^p $$
+// $$d(x, y) = \sum_{i=1}^{n} |x_i - y_i|^p$$
 //
 // where n is the length of the vectors.
 func minkowskiDistance(xq, index *mat.VecDense, p float64) (float64, error) {
