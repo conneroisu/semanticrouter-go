@@ -14,9 +14,10 @@ import (
 //
 // Match can be called on a Router to find the best route for a given utterance.
 type Router struct {
-	Routes       []Route             // Routes is a slice of Routes.
-	Encoder      Encoder             // Encoder is an Encoder that encodes utterances into vectors.
-	Storage      Store               // Storage is a Store that stores the utterances.
+	Routes  []Route // Routes is a slice of Routes.
+	Encoder Encoder // Encoder is an Encoder that encodes utterances into vectors.
+	Storage Store   // Storage is a Store that stores the utterances.
+
 	biFuncCoeffs []biFuncCoefficient // biFuncCoefficients is a slice of biFuncCoefficients that represent the bi-function coefficients.
 	workers      int                 // workers is the number of workers to use for computing similarity scores.
 }
