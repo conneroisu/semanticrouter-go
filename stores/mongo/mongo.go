@@ -48,7 +48,7 @@ func (s *Store) Get(ctx context.Context, utterance string) ([]float64, error) {
 	return floats, nil
 }
 
-// Set stores a value in the store.
+// Store stores a value in the store.
 func (s *Store) Store(ctx context.Context, keyValPair semanticrouter.Utterance) error {
 	_, err := s.coll.InsertOne(ctx, keyValPair)
 	if err != nil {
