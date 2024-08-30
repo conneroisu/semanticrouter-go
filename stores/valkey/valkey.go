@@ -11,7 +11,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-// Store is a simple key-value store for embeddings stored in valkey.
+// Store is a valkey/redis store for embeddings.
 type Store struct {
 	rds *redis.Client
 }
