@@ -3,4 +3,4 @@
 # 
 # Usage: make docs
 
-gomarkdoc --exclude-dirs ./testData/... ./... > docs/Home.md
+gomarkdoc -o README.md -e .

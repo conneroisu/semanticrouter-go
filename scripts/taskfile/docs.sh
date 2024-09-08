@@ -5,4 +5,4 @@
 
 
 gum spin --spinner dot --title "Generating Docs" --show-output -- \
-	gomarkdoc --exclude-dirs ./testData/... ./... > ./Code-Generated.md
+	gomarkdoc -o README.md -e .
