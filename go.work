@@ -8,8 +8,13 @@ use (
 	./encoders/google/
 	./encoders/ollama/
 	./encoders/voyageai/
+
+	./examples/chit-chat/
+	./examples/veterinarian/
+
 	./stores/memory/
 	./stores/mongo/
 	./stores/valkey/
+
 	./tools
 )
