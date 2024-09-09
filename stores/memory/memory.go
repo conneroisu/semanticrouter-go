@@ -3,12 +3,14 @@ package memory
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/conneroisu/semanticrouter-go"
 )
 
 // Store is a simple key-value store for embeddings.
 type Store struct {
+	mu    sync.RWMutex
 	store map[string][]float64
 }
 
@@ -29,16 +31,28 @@ func (s *Store) Get(
 	return embedding, nil
 }
 
-// Store sets a value in the store
-func (s *Store) Store(
+// Set sets a value in the in-memory store.
+//
+// It is concurrency safe.
+func (s *Store) Set(
 	_ context.Context,
 	utterance semanticrouter.Utterance,
 ) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	s.store[utterance.Utterance] = utterance.Embed
 	return nil
 }
 
 // Close closes the store.
-func (s Store) Close() error {
+//
+// It is concurrency safe.
+func (s *Store) Close() error {
+	if s.store == nil {
+		return nil
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.store = nil
 	return nil
 }

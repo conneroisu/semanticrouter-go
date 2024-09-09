@@ -1,6 +1,5 @@
 #!/bin/bash
 # file: makefile.install.sh
-# url: https://github.com/conneroisu/go-semantic-router/blob/main/scripts/makefile.install.sh
 # title: makefile.install.sh
 # description: A script to install the cse-ncaa project.
 #

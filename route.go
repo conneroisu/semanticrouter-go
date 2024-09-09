@@ -77,7 +77,7 @@ func NewRouter(
 				return nil, fmt.Errorf("error encoding utterance: %w", err)
 			}
 			utter.Embed = en
-			err = store.Store(ctx, utter)
+			err = store.Set(ctx, utter)
 			if err != nil {
 				return nil,
 					fmt.Errorf(

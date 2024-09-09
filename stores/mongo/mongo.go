@@ -7,26 +7,20 @@ import (
 	"github.com/conneroisu/semanticrouter-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Store is a MongoDB store.
+//
+// It implements the Store interface.
 type Store struct {
-	mdb  *mongo.Client
 	coll *mongo.Collection
 }
 
 // New creates a new MongoDB store.
-func New(uri string, db, collection string) (*Store, error) {
-	ctx := context.Background()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
-	if err != nil {
-		return nil, err
-	}
+func New(collection *mongo.Collection) *Store {
 	return &Store{
-		mdb:  client,
-		coll: client.Database(db).Collection(collection),
-	}, nil
+		coll: collection,
+	}
 }
 
 // Get gets a value from the store.
@@ -48,8 +42,8 @@ func (s *Store) Get(ctx context.Context, utterance string) ([]float64, error) {
 	return floats, nil
 }
 
-// Store stores a value in the store.
-func (s *Store) Store(ctx context.Context, keyValPair semanticrouter.Utterance) error {
+// Set stores a value in the store.
+func (s *Store) Set(ctx context.Context, keyValPair semanticrouter.Utterance) error {
 	_, err := s.coll.InsertOne(ctx, keyValPair)
 	if err != nil {
 		return err
@@ -59,9 +53,5 @@ func (s *Store) Store(ctx context.Context, keyValPair semanticrouter.Utterance) 
 
 // Close closes the MongoDB connection.
 func (s *Store) Close() error {
-	err := s.mdb.Disconnect(context.Background())
-	if err != nil {
-		return err
-	}
 	return nil
 }

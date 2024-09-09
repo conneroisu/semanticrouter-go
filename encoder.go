@@ -19,15 +19,15 @@ type Encoder interface {
 // and stores it in a some sort of data store, and a method, Get, which takes a
 // string and returns a []float64 from the data store.
 type Store interface {
-	Storer
+	Setter
 	Getter
 	io.Closer
 }
 
-// Storer is an interface that defines a method, Store, which takes a []float64
+// Setter is an interface that defines a method, Store, which takes a []float64
 // and stores it in a some sort of data store.
-type Storer interface {
-	Store(ctx context.Context, keyValPair Utterance) error
+type Setter interface {
+	Set(ctx context.Context, keyValPair Utterance) error
 }
 
 // Getter is an interface that defines a method, Get, which takes a

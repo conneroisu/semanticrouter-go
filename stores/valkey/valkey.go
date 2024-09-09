@@ -1,7 +1,6 @@
 package valkey
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -11,7 +10,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-// Store is a simple key-value store for embeddings stored in valkey.
+// Store is a valkey/redis store for embeddings.
 type Store struct {
 	rds *redis.Client
 }
@@ -42,15 +41,15 @@ func (s *Store) Get(
 		return nil, err
 	}
 	var utPr semanticrouter.Utterance
-	err = json.Unmarshal(bytes.NewBufferString(val).Bytes(), &utPr)
+	err = json.Unmarshal([]byte(val), &utPr)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshaling embedding: %w", err)
 	}
 	return utPr.Embed, nil
 }
 
-// Store sets a value in the valkey store.
-func (s *Store) Store(
+// Set sets a value in the valkey store.
+func (s *Store) Set(
 	ctx context.Context,
 	utterance semanticrouter.Utterance,
 ) error {
