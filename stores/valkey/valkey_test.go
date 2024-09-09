@@ -6,7 +6,7 @@ import (
 
 	"github.com/conneroisu/semanticrouter-go"
 	"github.com/conneroisu/semanticrouter-go/stores/valkey"
-	clientLib "github.com/redis/go-redis/v9"
+	redis "github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -37,14 +37,14 @@ func TestStore(t *testing.T) {
 	assert.NoError(t, err)
 	endpoint, err := redisContainer.Endpoint(ctx, "")
 	assert.NoError(t, err)
-	store := valkey.NewStore(clientLib.NewClient(
-		&clientLib.Options{
+	store := valkey.NewStore(redis.NewClient(
+		&redis.Options{
 			Addr:    endpoint,
 			Network: "tcp",
 		},
 	))
 
-	err = store.Store(
+	err = store.Set(
 		ctx,
 		semanticrouter.Utterance{
 			Utterance: "key",

@@ -22,7 +22,7 @@ func TestStore(t *testing.T) {
 		Utterance: "key",
 	}
 	utter.Embed = []float64{1.0, 2.0, 3.0, 4.0, 5.0}
-	err := store.Store(
+	err := store.Set(
 		ctx,
 		utter,
 	)
