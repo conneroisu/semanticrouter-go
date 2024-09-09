@@ -4,6 +4,10 @@ toolchain go1.23.0
 
 use (
 	.
+	./encoders/closedai/
+	./encoders/google/
+	./encoders/ollama/
+	./encoders/voyageai/
 	./stores/memory/
 	./stores/mongo/
 	./stores/valkey/

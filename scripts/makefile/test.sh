@@ -5,7 +5,8 @@
 #
 # Usage: make test
 
-go test ./... -coverprofile=coverage.out -race
+# go test ./... -coverprofile=coverage.out -race
+go list -f '{{.Dir}}/...' -m | xargs go test -coverprofile=coverage.out -race
 
 # if gocovsh is installed, then run it
 if command -v gocovsh > /dev/null; then
