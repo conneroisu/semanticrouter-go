@@ -38,7 +38,7 @@ func TestStore(t *testing.T) {
 		}
 	}()
 	collection := client.Database("test").Collection("test")
-	store := New(client, collection)
+	store := New(collection)
 	a.NoError(err)
 	err = store.Set(
 		ctx,
