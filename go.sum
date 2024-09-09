@@ -1,3 +1,5 @@
+github.com/conneroisu/semanticrouter-go/encoders/ollama v0.0.0-20240909025305-0a3db7c99137 h1:o8lf1E5Wa8iBuNLWiPvZPNUSEORWIjL+WFAXPp6fX2o=
+github.com/conneroisu/semanticrouter-go/encoders/ollama v0.0.0-20240909025305-0a3db7c99137/go.mod h1:+AsZ/eqfv7B0k9YNv0KVHeCyRX1vjN1mLYMTEGOnolw=
 github.com/conneroisu/semanticrouter-go/stores/memory v0.0.0-20240909020055-7c8ab7483baa h1:ofFlV/DbgpLd+5VzimdKSiCKfV30XMXS2Z3PGcVuPGw=
 github.com/conneroisu/semanticrouter-go/stores/memory v0.0.0-20240909020055-7c8ab7483baa/go.mod h1:yxb6pxh8SauT8ZEtM+iT5P5BAJVqzlCgyz5LE2TZsF4=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
@@ -9,11 +11,11 @@ github.com/kr/pretty v0.3.1/go.mod h1:hoEshYVHaxMs3cyo3Yncou5ZscifuDolrwPKZanG3x
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
 github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
 github.com/ollama/ollama v0.3.10 h1:fVOEBJjCGcWwrimipKWZwq0dBW39fMrYkJYMA81ghaE=
+github.com/ollama/ollama v0.3.10/go.mod h1:YrWoNkFnPOYsnDvsf/Ztb1wxU9/IXrNsQHqcxbY2r94=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rogpeppe/go-internal v1.11.0 h1:cWPaGQEPrBb5/AsnsZesgZZ9yb1OQ+GOISoDNXVBh4M=
 github.com/rogpeppe/go-internal v1.11.0/go.mod h1:ddIwULY96R17DhadqLgMfk9H9tvdUzkipdSkR5nkCZA=
-github.com/sashabaranov/go-openai v1.29.1 h1:AlB+vwpg1tibwr83OKXLsI4V1rnafVyTlw0BjR+6WUM=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
 github.com/stretchr/testify v1.9.0/go.mod h1:r2ic/lqez/lEtzL7wO/rwa5dbSLXVDPFyf8C91i36aY=
 golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 h1:LfspQV/FYTatPTr/3HzIcmiUFH7PGP+OQ6mgDYo3yuQ=

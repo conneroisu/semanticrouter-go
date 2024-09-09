@@ -1,15 +1,6 @@
-github.com/conneroisu/semanticrouter-go v0.9.3 h1:7fkjQrXcjwd5ocAha5a0lNQAt9YtbnwEIpfgN7cXsUI=
-github.com/conneroisu/semanticrouter-go v0.9.3/go.mod h1:WO8hn0woNopkkeU9mij+RrtHLpeH+mYZSRI7JJs0dbM=
-github.com/conneroisu/semanticrouter-go/stores/memory v0.0.0-20240909020055-7c8ab7483baa h1:ofFlV/DbgpLd+5VzimdKSiCKfV30XMXS2Z3PGcVuPGw=
-github.com/conneroisu/semanticrouter-go/stores/memory v0.0.0-20240909020055-7c8ab7483baa/go.mod h1:yxb6pxh8SauT8ZEtM+iT5P5BAJVqzlCgyz5LE2TZsF4=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/ollama/ollama v0.3.10 h1:fVOEBJjCGcWwrimipKWZwq0dBW39fMrYkJYMA81ghaE=
-github.com/ollama/ollama v0.3.10/go.mod h1:YrWoNkFnPOYsnDvsf/Ztb1wxU9/IXrNsQHqcxbY2r94=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/stretchr/testify v1.9.0 h1:HtqpIVDClZ4nwg75+f6Lvsy/wHu+3BoSGCbBAcpTsTg=
-golang.org/x/sync v0.7.0 h1:YsImfSBoP9QPYL0xyKJPq0gcaJdG3rInoqxTWbfQu9M=
-golang.org/x/sync v0.7.0/go.mod h1:Czt+wKu1gCyEFDUtn0jG5QVvpJ6rzVqr5aXyt9drQfk=
-gonum.org/v1/gonum v0.15.0 h1:2lYxjRbTYyxkJxlhC+LvJIx3SsANPdRybu1tGj9/OrQ=
-gonum.org/v1/gonum v0.15.0/go.mod h1:xzZVBJBtS+Mz4q0Yl2LJTk+OxOg4jiXZ7qBoM0uISGo=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
