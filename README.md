@@ -265,8 +265,8 @@ The semantic router is designed to be used in conjunction with LLMs and agents t
 - [type Router](<#Router>)
   - [func NewRouter\(routes \[\]Route, encoder Encoder, store Store, opts ...Option\) \(router \*Router, err error\)](<#NewRouter>)
   - [func \(r \*Router\) Match\(ctx context.Context, utterance string\) \(bestRoute \*Route, bestScore float64, err error\)](<#Router.Match>)
+- [type Setter](<#Setter>)
 - [type Store](<#Store>)
-- [type Storer](<#Storer>)
 - [type Utterance](<#Utterance>)
 
 
@@ -504,6 +504,17 @@ The score is the similarity score between the query vector and the index vector.
 
 If the given context is canceled, the context's error is returned if it is non\-nil.
 
+<a name="Setter"></a>
+## type [Setter](<https://github.com/conneroisu/go-semantic-router/blob/main/encoder.go#L29-L31>)
+
+Setter is an interface that defines a method, Store, which takes a \[\]float64 and stores it in a some sort of data store.
+
+```go
+type Setter interface {
+    Set(ctx context.Context, keyValPair Utterance) error
+}
+```
+
 <a name="Store"></a>
 ## type [Store](<https://github.com/conneroisu/go-semantic-router/blob/main/encoder.go#L21-L25>)
 
@@ -511,20 +522,9 @@ Store is an interface that defines a method, Store, which takes a \[\]float64 an
 
 ```go
 type Store interface {
-    Storer
+    Setter
     Getter
     io.Closer
-}
-```
-
-<a name="Storer"></a>
-## type [Storer](<https://github.com/conneroisu/go-semantic-router/blob/main/encoder.go#L29-L31>)
-
-Storer is an interface that defines a method, Store, which takes a \[\]float64 and stores it in a some sort of data store.
-
-```go
-type Storer interface {
-    Store(ctx context.Context, keyValPair Utterance) error
 }
 ```
 
