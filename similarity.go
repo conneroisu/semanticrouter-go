@@ -21,14 +21,14 @@ type Utterance struct {
 	Embed embedding
 }
 
-// NormalizeScores normalizes the similarity scores to a 0-1 range.
+// normalizeScores normalizes the similarity scores to a 0-1 range.
 // The function takes a slice of float64 values representing the similarity
 // scores.
 //
 // The function takes a slice of float64 values representing the
 // similarity scores and returns a slice of float64 values representing
 // the normalized similarity scores.
-func NormalizeScores(sim []float64) []float64 {
+func normalizeScores(sim []float64) []float64 {
 	minimum := floats.Min(sim)
 	maximum := floats.Max(sim)
 	normalized := make([]float64, len(sim))
