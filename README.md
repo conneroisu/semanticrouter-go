@@ -245,7 +245,6 @@ The semantic router is designed to be used in conjunction with LLMs and agents t
 
 ## Index
 
-- [func NormalizeScores\(sim \[\]float64\) \[\]float64](<#NormalizeScores>)
 - [type Encoder](<#Encoder>)
 - [type ErrEncoding](<#ErrEncoding>)
   - [func \(e ErrEncoding\) Error\(\) string](<#ErrEncoding.Error>)
@@ -269,17 +268,6 @@ The semantic router is designed to be used in conjunction with LLMs and agents t
 - [type Store](<#Store>)
 - [type Utterance](<#Utterance>)
 
-
-<a name="NormalizeScores"></a>
-## func [NormalizeScores](<https://github.com/conneroisu/go-semantic-router/blob/main/similarity.go#L31>)
-
-```go
-func NormalizeScores(sim []float64) []float64
-```
-
-NormalizeScores normalizes the similarity scores to a 0\-1 range. The function takes a slice of float64 values representing the similarity scores.
-
-The function takes a slice of float64 values representing the similarity scores and returns a slice of float64 values representing the normalized similarity scores.
 
 <a name="Encoder"></a>
 ## type [Encoder](<https://github.com/conneroisu/go-semantic-router/blob/main/encoder.go#L14-L16>)
