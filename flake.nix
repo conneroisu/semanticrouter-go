@@ -17,11 +17,7 @@
     extra-experimental-features = "nix-command flakes";
   };
 
-  outputs = inputs @ {
-    self,
-    flake-utils,
-    ...
-  }:
+  outputs = inputs @ {flake-utils, ...}:
     flake-utils.lib.eachSystem [
       "x86_64-linux"
       "i686-linux"
