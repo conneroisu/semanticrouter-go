@@ -1,6 +1,7 @@
 package semanticrouter_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/conneroisu/semanticrouter-go"
@@ -33,6 +34,9 @@ var ChitchatRoutes = semanticrouter.Route{
 // TestNewRouter tests the NewRouter function.
 func TestNewRouter(t *testing.T) {
 	a := assert.New(t)
+	if os.Getenv("OLLAMA_TEST") == "" {
+		t.Skip("Skipping test because OLLAMA_TEST is not set")
+	}
 	client, err := api.ClientFromEnvironment()
 	if err != nil {
 		t.Fatal(err)

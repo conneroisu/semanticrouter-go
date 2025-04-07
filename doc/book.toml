@@ -1,0 +1,23 @@
+[book]
+authors = [
+    "conneroisu"
+]
+language = "en"
+multilingual = false
+src = "src"
+title = "gohard"
+
+[preprocessor.cmdrun]
+command = "mdbook-cmdrun"
+
+[preprocessor.open-on-gh]
+command = "mdbook-open-on-gh"
+renderer = ["html"]
+
+[output.html]
+git-repository-url = "https://github.com/conneroisu/gohard"
+git-branch = "main"
+open-on-text = """
+<hr style="margin-top: 5em;" />
+Found an issue? [Edit this page on GitHub.]
+"""
