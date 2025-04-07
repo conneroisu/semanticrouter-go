@@ -1,73 +1,65 @@
-# Install
+# Installation
 
-## Install using Go (recommended)
-
-```bash
-go install github.com/conneroisu/gohard
-```
-
-## Install from source
+## Install using Go
 
 ```bash
-git clone https://github.com/conneroisu/gohard.git
-cd gohard
-go build
+go get github.com/conneroisu/semanticrouter-go
 ```
 
-## Install from binary
+This will add the package to your Go project.
 
-Download the latest binary from the [releases page](https://github.com/conneroisu/gohard/releases).
+## Install via Nix
 
-## Nix/NixOS
-
-Flake:
+If you're using Nix or NixOS, you can use the provided flake:
 
 ```nix
 {
-    inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     flake-utils.inputs.systems.follows = "systems";
-    inputs.gohard.url = "github:conneroisu/gohard";
-    inputs.gohard.inputs.nixpkgs.follows = "nixpkgs";
+    systems.url = "github:nix-systems/default";
+    semanticrouter-go.url = "github:conneroisu/semanticrouter-go";
+    semanticrouter-go.inputs.nixpkgs.follows = "nixpkgs";
+  };
 
-
-    outputs = { self, gohard, nixpkgs, flake-utils, ... }:
-    {
+  outputs = { self, semanticrouter-go, nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachSystem [
       "x86_64-linux"
-      "i686-linux"
+      "i686-linux" 
       "x86_64-darwin"
       "aarch64-linux"
       "aarch64-darwin"
     ] (system: let
-        pkgs = import nixpkgs { inherit system; };
+      pkgs = import nixpkgs { inherit system; };
     in
-        {
-            # OR for a shell
-            devShells.default = pkgs.mkShell {
-                buildInputs = with pkgs; [
-                    inputs.gohard.packages."${system}".gohard
-                ];
-            };
-        });
+      {
+        devShells.default = pkgs.mkShell {
+          buildInputs = with pkgs; [
+            semanticrouter-go.packages.${system}.semanticrouter-go
+          ];
+        };
+      });
 }
 ```
 
-## Install from Homebrew
+## Building from Source
 
 ```bash
-brew tap conneroisu/gohard
-brew install gohard
+git clone https://github.com/conneroisu/semanticrouter-go.git
+cd semanticrouter-go
+go build
 ```
 
-## Install from Snap
+## Development Shell
+
+The project includes a Nix development shell with all necessary tools:
 
 ```bash
-snap install gohard
+nix develop
 ```
 
-## Install from Docker
-
-```bash
-docker pull conneroisu/gohard
-```
+This provides access to commands like:
+- `tests` - Run all tests
+- `format` - Format code files
+- `lint` - Run linting tools
