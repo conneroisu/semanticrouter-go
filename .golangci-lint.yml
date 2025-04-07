@@ -1,0 +1,50 @@
+run:
+  timeout: 5m
+linters:
+  enable:
+    - asasalint
+    - bidichk
+    - bodyclose
+    - errcheck
+    - gocheckcompilerdirectives
+    - gosimple
+    - revive
+    - govet
+    - ineffassign
+    - intrange
+    - makezero
+    - misspell
+    - nilerr
+    - nosprintfhostport
+    - staticcheck
+    - unconvert
+    - unused
+    - usestdlibvars
+    - wastedassign
+    - whitespace
+linters-settings:
+  staticcheck:
+    checks:
+      - all
+      - -SA1019 # omit Deprecated check
+  revive:
+    enable-all-rules: false
+    ignore-generated-header: true
+    rules:
+      - name: blank-imports
+        exclude:
+          - vendor/
+
+severity:
+  default-severity: error
+  rules:
+    - linters:
+        - goimports
+        - intrange
+        - usestdlibvars
+      severity: info
+
+issues:
+  exclude-dirs:
+    - pkg/pegwings-go
+    - (^|/)vendor($|/)
