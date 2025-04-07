@@ -14,7 +14,8 @@ Traditional routing approaches rely on explicit rules, regular expressions, or k
 
 ### Which embedding models work best?
 
-For optimal performance, we recommend using models specifically designed for embeddings:
+For optimal performance, we recommend using models specifically designed for embeddings.
+For example:
 
 - OpenAI: `text-embedding-3-large` or `text-embedding-3-small`
 - Ollama: `mxbai-embed-large` or `nomic-embed-text`
