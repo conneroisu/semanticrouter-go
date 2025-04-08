@@ -7,7 +7,6 @@ require (
 	github.com/conneroisu/semanticrouter-go/stores/memory v0.0.0-20240909020055-7c8ab7483baa
 	github.com/ollama/ollama v0.3.10
 	github.com/stretchr/testify v1.9.0
-	golang.org/x/sync v0.7.0
 	gonum.org/v1/gonum v0.15.0
 )
 
