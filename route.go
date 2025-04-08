@@ -3,8 +3,9 @@ package semanticrouter
 import (
 	"context"
 	"fmt"
+	"log/slog"
+	"runtime"
 
-	"golang.org/x/sync/errgroup"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -20,6 +21,7 @@ type Router struct {
 
 	biFuncCoeffs []biFuncCoefficient // biFuncCoefficients is a slice of biFuncCoefficients that represent the bi-function coefficients.
 	workers      int                 // workers is the number of workers to use for computing similarity scores.
+	logger       *slog.Logger        // logger is a logger for the router.
 }
 
 // WithWorkers sets the number of workers to use for computing similarity scores.
@@ -50,7 +52,9 @@ func NewRouter(
 	store Store,
 	opts ...Option,
 ) (router *Router, err error) {
-	router = &Router{}
+	router = &Router{
+		logger: slog.Default(),
+	}
 	routesLen := len(routes)
 	ctx := context.Background()
 	if len(opts) == 0 {
@@ -60,13 +64,16 @@ func NewRouter(
 			WithManhattanDistance(1.0),
 			WithJaccardSimilarity(1.0),
 			WithPearsonCorrelation(1.0),
-			WithWorkers(1),
+			WithWorkers(runtime.NumCPU()),
 		}
 	}
 	for _, opt := range opts {
 		opt(router)
 	}
-	for i := 0; i < routesLen; i++ {
+	router.logger.Debug("initializing router")
+	defer router.logger.Debug("router initialized")
+	for i := range routesLen {
+		slog.Debug("initializing route", "route", routes[i].Name)
 		for _, utter := range routes[i].Utterances {
 			_, err = store.Get(ctx, utter.Utterance)
 			if err == nil {
@@ -88,11 +95,10 @@ func NewRouter(
 			}
 		}
 	}
-	return &Router{
-		Routes:  routes,
-		Encoder: encoder,
-		Storage: store,
-	}, nil
+	router.Storage = store
+	router.Encoder = encoder
+	router.Routes = routes
+	return router, nil
 }
 
 // Match returns the route that matches the given utterance.
@@ -104,6 +110,9 @@ func (r *Router) Match(
 	ctx context.Context,
 	utterance string,
 ) (bestRoute *Route, bestScore float64, err error) {
+	bestRoute = &Route{}
+	r.logger.Debug("matching route", "utterance", utterance)
+	defer r.logger.Debug("route matched", "route", bestRoute.Name, "score", bestScore)
 	encoding, err := r.Encoder.Encode(ctx, utterance)
 	if err != nil {
 		return nil, 0.0, ErrEncoding{
@@ -129,7 +138,10 @@ func (r *Router) Match(
 			}
 			emLen := len(em)
 			if emLen != queryVec.Len() {
-				continue
+				return nil, 0.0, ErrEmbeddingLengthMismatch{
+					EmbeddingLength: emLen,
+					QueryLength:     queryVec.Len(),
+				}
 			}
 			indexVec = mat.NewVecDense(emLen, em)
 			simScore, err = r.computeScore(queryVec, indexVec)
@@ -156,17 +168,19 @@ func (r *Router) computeScore(
 	indexVec *mat.VecDense,
 ) (float64, error) {
 	score := 0.0
-	eg := errgroup.Group{}
-	eg.SetLimit(r.workers)
 	for _, fn := range r.biFuncCoeffs {
-		eg.Go(func() error {
-			interScore, err := fn.handler(queryVec, indexVec)
-			if err != nil {
-				return err
-			}
-			score += fn.coefficient * interScore
-			return nil
-		})
+		interScore, err := fn.handler(queryVec, indexVec)
+		if err != nil {
+			return 0, err
+		}
+		score += fn.coefficient * interScore
 	}
-	return score, eg.Wait()
+	return score, nil
+}
+
+// WithLogger sets the logger for the router.
+func WithLogger(logger *slog.Logger) Option {
+	return func(r *Router) {
+		r.logger = logger
+	}
 }

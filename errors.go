@@ -1,5 +1,7 @@
 package semanticrouter
 
+import "fmt"
+
 // ErrNoRouteFound is an error that is returned when no route is found.
 type ErrNoRouteFound struct {
 	Message   string
@@ -30,4 +32,19 @@ type ErrGetEmbedding struct {
 // Error returns the error message.
 func (e ErrGetEmbedding) Error() string {
 	return e.Message
+}
+
+// ErrEmbeddingLengthMismatch is an error that is returned when an embedding has a different length than the query vector.
+type ErrEmbeddingLengthMismatch struct {
+	EmbeddingLength int
+	QueryLength     int
+}
+
+// Error returns the error message.
+func (e ErrEmbeddingLengthMismatch) Error() string {
+	return fmt.Sprintf(
+		"embedding length mismatch: %d != %d",
+		e.EmbeddingLength,
+		e.QueryLength,
+	)
 }
