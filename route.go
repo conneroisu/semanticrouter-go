@@ -31,6 +31,13 @@ func WithWorkers(workers int) Option {
 	}
 }
 
+// WithLogger sets the logger for the router.
+func WithLogger(logger *slog.Logger) Option {
+	return func(r *Router) {
+		r.logger = logger
+	}
+}
+
 // Route represents a route in the semantic router.
 //
 // It is a struct that contains a name and a slice of Utterances.
@@ -176,11 +183,4 @@ func (r *Router) computeScore(
 		score += fn.coefficient * interScore
 	}
 	return score, nil
-}
-
-// WithLogger sets the logger for the router.
-func WithLogger(logger *slog.Logger) Option {
-	return func(r *Router) {
-		r.logger = logger
-	}
 }
