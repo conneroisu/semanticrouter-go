@@ -39,7 +39,7 @@ jobs:
           github_access_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: cachix/cachix-action@ad2ddac53f961de1989924296a1f236fcfbaa4fc # v15
         with:
-          name: libsqlz
+          name: semanticrouter-go
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - run: nix build --accept-flake-config --no-pure-eval -L ".#devShells.${{ matrix.system }}.default"
 
