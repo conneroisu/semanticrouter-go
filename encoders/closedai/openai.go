@@ -7,12 +7,24 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 )
 
+// Client is a minimal interface for the OpenAI client.
+type Client interface {
+	CreateEmbeddings(ctx context.Context, req openai.EmbeddingRequest) (openai.EmbeddingResponse, error)
+}
+
 // Encoder encodes a query string into an OpenAI embedding.
 type Encoder struct {
 	// Client is the OpenAI client.
-	Client *openai.Client
+	Client Client
 	// Model is the OpenAI embedding model to use.
 	Model openai.EmbeddingModel
+}
+
+func NewEncoder(client Client, model openai.EmbeddingModel) Encoder {
+	return Encoder{
+		Client: client,
+		Model:  model,
+	}
 }
 
 // Encode encodes the given utterance using the OpenAI API.
