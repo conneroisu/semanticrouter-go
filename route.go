@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"runtime"
 
 	"gonum.org/v1/gonum/mat"
 )
@@ -63,7 +62,6 @@ func NewRouter(
 			WithManhattanDistance(1.0),
 			WithJaccardSimilarity(1.0),
 			WithPearsonCorrelation(1.0),
-			WithWorkers(runtime.NumCPU()),
 		}
 	}
 	for _, opt := range opts {

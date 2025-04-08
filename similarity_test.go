@@ -411,7 +411,7 @@ func TestMinkowskiDistance(t *testing.T) {
 		a := assert.New(t)
 		xq := mat.NewVecDense(len(tt.xq), tt.xq)
 		index := mat.NewVecDense(len(tt.index), tt.index)
-		got, err := minkowskiDistance(xq, index, tt.p)
+		got, err := minkowskiDistance(tt.p)(xq, index)
 		a.NoError(err)
 		if math.Abs(got-tt.want) > 1e-9 {
 			t.Errorf(
