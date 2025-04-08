@@ -185,6 +185,7 @@ func jaccardSimilarity(xq, index *mat.VecDense) (float64, error) {
 	minSum := 0.0
 	maxSum := 0.0
 	for i := range xq.Len() {
+		println(xq.AtVec(i), index.AtVec(i))
 		minSum += math.Min(xq.AtVec(i), index.AtVec(i))
 		maxSum += math.Max(xq.AtVec(i), index.AtVec(i))
 	}
