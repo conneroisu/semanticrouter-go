@@ -1,6 +1,6 @@
 module github.com/conneroisu/semanticrouter-go
 
-go 1.23.0
+go 1.24.0
 
 require (
 	github.com/conneroisu/semanticrouter-go/encoders/ollama v0.0.0-20240909025305-0a3db7c99137

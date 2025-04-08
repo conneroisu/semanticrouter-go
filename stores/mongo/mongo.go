@@ -3,35 +3,52 @@ package mongo
 
 import (
 	"context"
+	"io"
 
 	"github.com/conneroisu/semanticrouter-go"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+// Cursor is a MongoDB cursor.
+//
+// It implements an minimal subset of the mongo.Cursor interface.
+type Cursor interface {
+	All(ctx context.Context, result any) error
+	io.Closer
+}
+
+// Collection is a MongoDB collection.
+//
+// It implements an minimal subset of the mongo.Collection interface.
+type Collection interface {
+	Find(ctx context.Context, filter any, opts ...*options.FindOptions) (cur *mongo.Cursor, err error)
+	InsertOne(ctx context.Context, doc any, opts ...*options.InsertOneOptions) (*mongo.InsertOneResult, error)
+}
 
 // Store is a MongoDB store.
 //
 // It implements the Store interface.
 type Store struct {
-	coll *mongo.Collection
+	coll Collection
 }
 
 // New creates a new MongoDB store.
-func New(collection *mongo.Collection) *Store {
-	return &Store{
-		coll: collection,
-	}
+func New(collection Collection) *Store {
+	return &Store{coll: collection}
 }
 
 // Get gets a value from the store.
 func (s *Store) Get(ctx context.Context, utterance string) ([]float64, error) {
-	var floats []float64
-	filter := bson.M{"utterance": utterance}
-	cur, err := s.coll.Find(ctx, filter)
+	var (
+		floats  []float64
+		results []semanticrouter.Utterance
+	)
+	cur, err := s.coll.Find(ctx, bson.M{"utterance": utterance})
 	if err != nil {
 		return nil, err
 	}
-	var results []semanticrouter.Utterance
 	if err = cur.All(ctx, &results); err != nil {
 		panic(err)
 	}

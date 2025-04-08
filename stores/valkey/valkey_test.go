@@ -37,12 +37,13 @@ func TestStore(t *testing.T) {
 	assert.NoError(t, err)
 	endpoint, err := redisContainer.Endpoint(ctx, "")
 	assert.NoError(t, err)
-	store := valkey.NewStore(redis.NewClient(
+	cli := redis.NewClient(
 		&redis.Options{
 			Addr:    endpoint,
 			Network: "tcp",
 		},
-	))
+	)
+	store := valkey.NewStore(cli)
 
 	err = store.Set(
 		ctx,
