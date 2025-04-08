@@ -117,6 +117,16 @@ func WithPearsonCorrelation(coefficient float64) Option {
 	}
 }
 
+// WithMinkowskiDistance sets the MinkowskiDistance function with a coefficient.
+func WithMinkowskiDistance(p float64) Option {
+	return func(r *Router) {
+		r.biFuncCoeffs = append(r.biFuncCoeffs, biFuncCoefficient{
+			handler:     minkowskiDistance(p),
+			coefficient: 1,
+		})
+	}
+}
+
 // SimilarityDotMatrix computes the similarity scores between a query vector and
 // a set of vectors.
 //
@@ -252,16 +262,18 @@ func hammingDistance(xq, index *mat.VecDense) (float64, error) {
 // $$d(x, y) = \sum_{i=1}^{n} |x_i - y_i|^p$$
 //
 // where n is the length of the vectors.
-func minkowskiDistance(xq, index *mat.VecDense, p float64) (float64, error) {
-	if p <= 0 {
-		panic("Order p must be greater than 0")
-	}
+func minkowskiDistance(p float64) func(xq, index *mat.VecDense) (float64, error) {
+	return func(xq, index *mat.VecDense) (float64, error) {
+		if p <= 0 {
+			panic("Order p must be greater than 0")
+		}
 
-	diff := mat.NewVecDense(xq.Len(), nil)
-	diff.SubVec(xq, index)
-	sum := 0.0
-	for i := range diff.Len() {
-		sum += math.Pow(math.Abs(diff.AtVec(i)), p)
+		diff := mat.NewVecDense(xq.Len(), nil)
+		diff.SubVec(xq, index)
+		sum := 0.0
+		for i := range diff.Len() {
+			sum += math.Pow(math.Abs(diff.AtVec(i)), p)
+		}
+		return math.Pow(sum, 1/p), nil
 	}
-	return math.Pow(sum, 1/p), nil
 }
