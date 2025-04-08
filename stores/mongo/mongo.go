@@ -3,6 +3,7 @@ package mongo
 
 import (
 	"context"
+	"io"
 
 	"github.com/conneroisu/semanticrouter-go"
 	"go.mongodb.org/mongo-driver/bson"
@@ -15,7 +16,7 @@ import (
 // It implements an minimal subset of the mongo.Cursor interface.
 type Cursor interface {
 	All(ctx context.Context, result any) error
-	Close(ctx context.Context) error
+	io.Closer
 }
 
 // Collection is a MongoDB collection.
@@ -34,7 +35,7 @@ type Store struct {
 }
 
 // New creates a new MongoDB store.
-func New(collection *mongo.Collection) *Store {
+func New(collection Collection) *Store {
 	return &Store{coll: collection}
 }
 
