@@ -1,4 +1,4 @@
-package encoders
+package google
 
 import (
 	"context"
@@ -6,23 +6,33 @@ import (
 	"github.com/google/generative-ai-go/genai"
 )
 
-// GoogleEncoder encodes a query string into a Google search URL.
-type GoogleEncoder struct {
-	client genai.Client
+// Client is a minimal client for the Google Generative AI API.
+type Client interface {
+	EmbeddingModel(name string) Model
+}
+
+// Model is a minimal model for the Google Generative AI API.
+type Model interface {
+	EmbedContent(ctx context.Context, content genai.Text) (genai.EmbedContentResponse, error)
+}
+
+// Encoder encodes a query string into a Google search URL.
+type Encoder struct {
+	client Client
 	name   string
 }
 
-// NewGoogleEncoder creates a new GoogleEncoder.
-func NewGoogleEncoder(
-	client genai.Client,
-) *GoogleEncoder {
-	return &GoogleEncoder{
+// NewEncoder creates a new GoogleEncoder.
+func NewEncoder(
+	client Client,
+) *Encoder {
+	return &Encoder{
 		client: client,
 	}
 }
 
 // Encode encodes a query string into a Google search URL.
-func (e *GoogleEncoder) Encode(
+func (e *Encoder) Encode(
 	ctx context.Context,
 	query string,
 ) ([]float64, error) {
@@ -30,8 +40,9 @@ func (e *GoogleEncoder) Encode(
 	case <-ctx.Done():
 		return nil, ctx.Err()
 	default:
-		model := e.client.EmbeddingModel(e.name)
-		embedding, err := model.EmbedContent(ctx, genai.Text(query))
+		embedding, err := e.client.EmbeddingModel(
+			e.name,
+		).EmbedContent(ctx, genai.Text(query))
 		if err != nil {
 			return nil, err
 		}
