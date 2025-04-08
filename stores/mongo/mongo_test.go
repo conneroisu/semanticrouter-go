@@ -1,7 +1,6 @@
 package mongo
 
 import (
-	"context"
 	"log"
 	"testing"
 
@@ -17,22 +16,23 @@ var (
 )
 
 func TestStore(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping non-short test")
+	}
 	a := assert.New(t)
-	ctx := context.Background()
-
-	mongodbContainer, err := mongodb.Run(ctx, "mongo:6")
+	mongodbContainer, err := mongodb.Run(t.Context(), "mongo:6")
 	a.NoError(err)
 	defer func() {
-		if err := mongodbContainer.Terminate(ctx); err != nil {
+		if Terr := mongodbContainer.Terminate(t.Context()); Terr != nil {
 			log.Fatalf("failed to terminate container: %s", err)
 		}
 	}()
-	uri, err := mongodbContainer.ConnectionString(ctx)
+	uri, err := mongodbContainer.ConnectionString(t.Context())
 	a.NoError(err)
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
+	client, err := mongo.Connect(t.Context(), options.Client().ApplyURI(uri))
 	a.NoError(err)
 	defer func() {
-		err = client.Disconnect(ctx)
+		err = client.Disconnect(t.Context())
 		if err != nil {
 			log.Fatalf("failed to disconnect from mongodb: %s", err)
 		}
@@ -41,14 +41,14 @@ func TestStore(t *testing.T) {
 	store := New(collection)
 	a.NoError(err)
 	err = store.Set(
-		ctx,
+		t.Context(),
 		semanticrouter.Utterance{
 			Utterance: "key",
 			Embed:     []float64{1.0, 2.0, 3.0, 4.0, 5.0},
 		})
 	a.NoError(err)
 
-	floats, err := store.Get(ctx, "key")
+	floats, err := store.Get(t.Context(), "key")
 	a.NoError(err)
 	a.Len(floats, 5)
 }
