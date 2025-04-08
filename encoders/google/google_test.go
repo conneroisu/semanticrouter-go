@@ -17,15 +17,13 @@ func TestEncoder_Encode(t *testing.T) {
 	assert.Equal(t, []float64{0.0}, result)
 }
 
-type mockClient struct {
-}
+type mockClient struct{}
 
 func (m mockClient) EmbeddingModel(_ string) Model {
 	return mockModel{}
 }
 
-type mockModel struct {
-}
+type mockModel struct{}
 
 func (m mockModel) EmbedContent(_ context.Context, _ genai.Text) (genai.EmbedContentResponse, error) {
 	return genai.EmbedContentResponse{
