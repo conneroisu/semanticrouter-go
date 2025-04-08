@@ -20,15 +20,7 @@ type Router struct {
 	Storage Store   // Storage is a Store that stores the utterances.
 
 	biFuncCoeffs []biFuncCoefficient // biFuncCoefficients is a slice of biFuncCoefficients that represent the bi-function coefficients.
-	workers      int                 // workers is the number of workers to use for computing similarity scores.
 	logger       *slog.Logger        // logger is a logger for the router.
-}
-
-// WithWorkers sets the number of workers to use for computing similarity scores.
-func WithWorkers(workers int) Option {
-	return func(r *Router) {
-		r.workers = workers
-	}
 }
 
 // WithLogger sets the logger for the router.
