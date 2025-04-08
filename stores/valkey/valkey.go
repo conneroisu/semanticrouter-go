@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"time"
 
 	"github.com/conneroisu/semanticrouter-go"
 	"github.com/redis/go-redis/v9"
@@ -12,11 +14,20 @@ import (
 
 // Store is a valkey/redis store for embeddings.
 type Store struct {
-	rds *redis.Client
+	rds Client
+}
+
+// Client is a redis client for valkey.
+//
+// This is a minimal interface to allow for different redis clients.
+type Client interface {
+	Get(ctx context.Context, key string) *redis.StringCmd
+	Set(ctx context.Context, key string, value any, expiration time.Duration) *redis.StatusCmd
+	io.Closer
 }
 
 // NewStore creates a new Store from a redis client.
-func NewStore(rds *redis.Client) *Store {
+func NewStore(rds Client) *Store {
 	return &Store{rds: rds}
 }
 
@@ -30,17 +41,19 @@ func (s *Store) Get(
 	ctx context.Context,
 	utterance string,
 ) (embedding []float64, err error) {
-	cmd := s.rds.Get(ctx, utterance)
-	val, err := cmd.Result()
+	var (
+		res  *redis.StringCmd
+		val  string
+		utPr semanticrouter.Utterance
+	)
+	res = s.rds.Get(ctx, utterance)
+	val, err = res.Result()
 	if err != nil {
 		if errors.Is(err, redis.Nil) {
-			fmt.Println("key2 does not exist")
-			fmt.Println(err)
 			return nil, fmt.Errorf("key does not exist: %w", err)
 		}
 		return nil, err
 	}
-	var utPr semanticrouter.Utterance
 	err = json.Unmarshal([]byte(val), &utPr)
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshaling embedding: %w", err)
@@ -52,18 +65,22 @@ func (s *Store) Get(
 func (s *Store) Set(
 	ctx context.Context,
 	utterance semanticrouter.Utterance,
-) error {
-	val, err := json.Marshal(utterance)
+) (err error) {
+	var (
+		val []byte
+		res *redis.StatusCmd
+	)
+	val, err = json.Marshal(utterance)
 	if err != nil {
 		return fmt.Errorf("error marshaling embedding: %w", err)
 	}
-	cmd := s.rds.Set(
+	res = s.rds.Set(
 		ctx,
 		utterance.Utterance,
 		string(val),
 		0,
 	)
-	err = cmd.Err()
+	err = res.Err()
 	if err != nil {
 		return fmt.Errorf("error setting embedding: %w", err)
 	}
