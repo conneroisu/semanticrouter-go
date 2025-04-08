@@ -5,7 +5,7 @@ authors = [
 language = "en"
 multilingual = false
 src = "src"
-title = "gohard"
+title = "semanticrouter-go"
 
 [preprocessor.cmdrun]
 command = "mdbook-cmdrun"
@@ -15,7 +15,7 @@ command = "mdbook-open-on-gh"
 renderer = ["html"]
 
 [output.html]
-git-repository-url = "https://github.com/conneroisu/gohard"
+git-repository-url = "https://github.com/conneroisu/semanticrouter-go"
 git-branch = "main"
 open-on-text = """
 <hr style="margin-top: 5em;" />
