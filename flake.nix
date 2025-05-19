@@ -3,18 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
-    flake-utils = {
-      url = "github:numtide/flake-utils";
-      inputs.systems.follows = "systems";
-    };
-    systems.url = "github:nix-systems/default";
-  };
-
-  nixConfig = {
-    extra-substituters = ''https://conneroisu.cachix.org'';
-    extra-trusted-public-keys = ''conneroisu.cachix.org-1:PgOlJ8/5i/XBz2HhKZIYBSxNiyzalr1B/63T74lRcU0='';
-    extra-experimental-features = "nix-command flakes";
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = inputs @ {flake-utils, ...}:
@@ -60,30 +49,6 @@
               ${pkgs.deadnix}/bin/deadnix $REPO_ROOT/flake.nix
             '';
             description = "Run Linting Steps.";
-          };
-          format = {
-            exec = ''
-              cd $(git rev-parse --show-toplevel)
-
-              ${pkgs.go}/bin/go fmt ./...
-
-              ${pkgs.git}/bin/git ls-files \
-                --others \
-                --exclude-standard \
-                --cached \
-                -- '*.js' '*.ts' '*.css' '*.md' '*.json' \
-                | xargs prettier --write
-
-              ${pkgs.golines}/bin/golines \
-                -l \
-                -w \
-                --max-len=80 \
-                --shorten-comments \
-                --ignored-dirs=.direnv .
-
-              cd -
-            '';
-            description = "Format code files";
           };
         };
 
