@@ -34,6 +34,21 @@
             exec = ''$EDITOR $REPO_ROOT/go.mod'';
             description = "Edit go.mod";
           };
+          initWorkspace = {
+            exec = ''
+              ${pkgs.go}/bin/go work init
+              ${pkgs.go}/bin/go work use .
+              ${pkgs.go}/bin/go work use ./encoders/closedai
+              ${pkgs.go}/bin/go work use ./encoders/google
+              ${pkgs.go}/bin/go work use ./encoders/ollama
+              ${pkgs.go}/bin/go work use ./encoders/voyageai
+              ${pkgs.go}/bin/go work use ./stores/bolt
+              ${pkgs.go}/bin/go work use ./stores/memory
+              ${pkgs.go}/bin/go work use ./stores/mongo
+              ${pkgs.go}/bin/go work use ./stores/valkey
+            '';
+            description = "Initialize Workspace";
+          };
           clean = {
             exec = ''${pkgs.git}/bin/git clean -fdx'';
             description = "Clean Project";
