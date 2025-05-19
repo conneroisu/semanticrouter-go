@@ -9,6 +9,11 @@
       inputs.systems.follows = "systems";
     };
     systems.url = "github:nix-systems/default";
+
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   nixConfig = {
@@ -17,7 +22,12 @@
     extra-experimental-features = "nix-command flakes";
   };
 
-  outputs = inputs @ {flake-utils, ...}:
+  outputs = inputs @ {
+    self,
+    flake-utils,
+    treefmt-nix,
+    ...
+  }:
     flake-utils.lib.eachSystem [
       "x86_64-linux"
       "i686-linux"
@@ -32,9 +42,51 @@
           overlay
         ];
       };
+
+      # Configure treefmt (inline configuration)
+      treefmtEval = treefmt-nix.lib.evalModule pkgs {
+        # Used to find the project root
+        projectRootFile = "flake.nix";
+
+        # Enable specific formatters
+        programs = {
+          # Nix formatters
+          alejandra.enable = true;
+          deadnix.enable = true;
+          statix.enable = true;
+
+          # Go formatters
+          gofmt.enable = true;
+          gofumpt.enable = true;
+          goimports.enable = true;
+          golines.enable = true;
+
+          # Markdown formatter
+          mdformat.enable = true;
+
+          # JSON formatter
+          prettier = {
+            enable = true;
+            includes = [
+              "*.css"
+              "*.js"
+              "*.json"
+              "*.ts"
+              "*.yaml"
+              "*.yml"
+            ];
+          };
+        };
+      };
       buildGoModule = pkgs.buildGoModule.override {go = pkgs.go_1_24;};
       buildWithSpecificGo = pkg: pkg.override {inherit buildGoModule;};
     in {
+      # For `nix fmt`
+      formatter = treefmtEval.config.build.wrapper;
+
+      # For `nix flake check`
+      checks.formatting = treefmtEval.config.build.check self;
+
       devShells.default = let
         scripts = {
           dx = {
@@ -61,30 +113,6 @@
             '';
             description = "Run Linting Steps.";
           };
-          format = {
-            exec = ''
-              cd $(git rev-parse --show-toplevel)
-
-              ${pkgs.go}/bin/go fmt ./...
-
-              ${pkgs.git}/bin/git ls-files \
-                --others \
-                --exclude-standard \
-                --cached \
-                -- '*.js' '*.ts' '*.css' '*.md' '*.json' \
-                | xargs prettier --write
-
-              ${pkgs.golines}/bin/golines \
-                -l \
-                -w \
-                --max-len=80 \
-                --shorten-comments \
-                --ignored-dirs=.direnv .
-
-              cd -
-            '';
-            description = "Format code files";
-          };
         };
 
         # Convert scripts to packages
@@ -109,11 +137,9 @@
           '';
           packages = with pkgs;
             [
-              # Nix
-              alejandra
+              # Formatters and Nix tools
+              treefmtEval.config.build.wrapper
               nixd
-              statix
-              deadnix
 
               # Go Tools
               go_1_24
@@ -123,7 +149,6 @@
               (buildWithSpecificGo revive)
               (buildWithSpecificGo gopls)
               (buildWithSpecificGo templ)
-              (buildWithSpecificGo golines)
               (buildWithSpecificGo golangci-lint-langserver)
               (buildWithSpecificGo gomarkdoc)
               (buildWithSpecificGo gotests)
