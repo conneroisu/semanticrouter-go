@@ -21,6 +21,7 @@
 - [In-Memory](./stores/memory.md)
 - [MongoDB](./stores/mongo.md)
 - [Valkey](./stores/valkey.md)
+- [BoltDB](./stores/bolt.md)
 
 # Meta
 

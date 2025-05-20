@@ -3,23 +3,15 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
     flake-utils = {
       url = "github:numtide/flake-utils";
       inputs.systems.follows = "systems";
     };
     systems.url = "github:nix-systems/default";
-
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-  };
-
-  nixConfig = {
-    extra-substituters = ''https://conneroisu.cachix.org'';
-    extra-trusted-public-keys = ''conneroisu.cachix.org-1:PgOlJ8/5i/XBz2HhKZIYBSxNiyzalr1B/63T74lRcU0='';
-    extra-experimental-features = "nix-command flakes";
   };
 
   outputs = inputs @ {
@@ -96,6 +88,21 @@
           gx = {
             exec = ''$EDITOR $REPO_ROOT/go.mod'';
             description = "Edit go.mod";
+          };
+          initWorkspace = {
+            exec = ''
+              ${pkgs.go}/bin/go work init
+              ${pkgs.go}/bin/go work use .
+              ${pkgs.go}/bin/go work use ./encoders/closedai
+              ${pkgs.go}/bin/go work use ./encoders/google
+              ${pkgs.go}/bin/go work use ./encoders/ollama
+              ${pkgs.go}/bin/go work use ./encoders/voyageai
+              ${pkgs.go}/bin/go work use ./stores/bolt
+              ${pkgs.go}/bin/go work use ./stores/memory
+              ${pkgs.go}/bin/go work use ./stores/mongo
+              ${pkgs.go}/bin/go work use ./stores/valkey
+            '';
+            description = "Initialize Workspace";
           };
           clean = {
             exec = ''${pkgs.git}/bin/git clean -fdx'';

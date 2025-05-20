@@ -3,3 +3,5 @@ coverage.out
 *.direnv
 result
 CLAUDE.md
+go.work
+go.work.sum
